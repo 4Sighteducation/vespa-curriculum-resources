@@ -1,0 +1,33 @@
+{
+  "name": "vespa-curriculum-resources",
+  "version": "1.0.0",
+  "description": "Complete replacement for KSENSE curriculum delivery system",
+  "main": "dist/curriculum-main.js",
+  "scripts": {
+    "build": "echo 'Build process: Copy src files to dist manually or use build tool'",
+    "test": "echo 'Run tests in browser - see TESTING.md'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4Sighteducation/vespa-curriculum-resources.git"
+  },
+  "keywords": [
+    "vespa",
+    "curriculum",
+    "education",
+    "knack",
+    "vue3"
+  ],
+  "author": "4Sight Education",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/4Sighteducation/vespa-curriculum-resources/issues"
+  },
+  "homepage": "https://github.com/4Sighteducation/vespa-curriculum-resources#readme",
+  "dependencies": {},
+  "devDependencies": {},
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  }
+}
+

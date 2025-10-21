@@ -1,0 +1,38 @@
+# Commands to Push to GitHub
+
+## First Time Setup
+
+cd "C:\Users\tonyd\OneDrive - 4Sight Education Ltd\Apps\Resources"
+
+git init
+
+git add .
+
+git commit -m "Initial commit - VESPA Curriculum Resources v1.0 - Complete KSENSE replacement"
+
+git remote add origin https://github.com/4Sighteducation/vespa-curriculum-resources.git
+
+git branch -M main
+
+git push -u origin main
+
+
+## Future Updates
+
+cd "C:\Users\tonyd\OneDrive - 4Sight Education Ltd\Apps\Resources"
+
+git add .
+
+git commit -m "Update: Description of changes"
+
+git push
+
+
+## After Pushing
+
+Wait 2-5 minutes for jsDelivr CDN to sync, then test:
+https://cdn.jsdelivr.net/gh/4Sighteducation/vespa-curriculum-resources@main/dist/curriculum-main.js
+https://cdn.jsdelivr.net/gh/4Sighteducation/vespa-curriculum-resources@main/dist/curriculum-main.css
+
+If they load in browser, the CDN is ready!
+
