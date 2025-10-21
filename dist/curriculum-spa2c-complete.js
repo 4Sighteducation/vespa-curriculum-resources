@@ -8,6 +8,29 @@ console.log('[Curriculum SPA v2c] Loading...');
 class CurriculumAPI {
     constructor(config) {
         this.config = config;
+        this.allActivitiesCache = null; // For cross-book problem search
+    }
+    
+    // NEW: Get ALL activities (all books) for problem search
+    async getAllActivities() {
+        if (this.allActivitiesCache) return this.allActivitiesCache;
+        
+        const filters = {
+            match: 'and',
+            rules: [{ field: 'field_1924', operator: 'is', value: 'No' }] // Only non-Welsh
+        };
+        
+        const records = await this.fetch('object_58', filters);
+        console.log('[API] Fetched', records.length, 'total activities (all books)');
+        
+        this.allActivitiesCache = records.map(r => ({
+            id: r.id, book: r.field_2702, activityId: r.field_1446,
+            theme: r.field_1461 || 'General', name: r.field_1431,
+            group: r.field_1435_raw || r.field_1435,
+            content: r.field_1448_raw || r.field_1448
+        }));
+        
+        return this.allActivitiesCache;
     }
 
     getCurrentUser() {
@@ -48,11 +71,14 @@ class CurriculumAPI {
     async getActivities(bookName) {
         const filters = {
             match: 'and',
-            rules: [{ field: 'field_2702', operator: 'is', value: bookName }]
+            rules: [
+                { field: 'field_2702', operator: 'is', value: bookName },
+                { field: 'field_1924', operator: 'is', value: 'No' } // Filter out Welsh
+            ]
         };
         
         const records = await this.fetch('object_58', filters);
-        console.log('[API] Fetched', records.length, 'activities');
+        console.log('[API] Fetched', records.length, 'NON-Welsh activities');
         
         return records.map(r => ({
             id: r.id,
@@ -306,10 +332,11 @@ const P1 = {
 
 // ===== PAGE 2: ACTIVITY BROWSER (FIXED) =====
 const P2 = {
-    async show(api, bookName) {
+    async show(api, bookName, highlightActivityIds = null) {
         State.book = bookName;
         State.page = 'browser';
         State.filters = { search: '', theme: 'All', month: 'All' }; // Reset filters
+        State.highlightIds = highlightActivityIds; // For problem search highlighting
         
         document.querySelectorAll('.curriculum-page').forEach(p => p.classList.remove('active'));
         document.querySelector('[data-page="browser"]').classList.add('active');
@@ -559,7 +586,6 @@ const P2 = {
             
             return `
                 <div class="activity-row ${isCompleted ? 'completed' : ''}" onclick="P3.show(window.api, '${a.id}')">
-                    <div class="row-id">#${a.activityId}</div>
                     <div class="row-theme" style="background: ${U.getColor(a.theme)}">${a.theme}</div>
                     <div class="row-name">${a.name}</div>
                     <div class="row-month">${month}</div>
