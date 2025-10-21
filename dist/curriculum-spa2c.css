@@ -362,7 +362,7 @@
 
 .activity-row {
     display: grid;
-    grid-template-columns: 60px 120px 1fr 80px 120px;
+    grid-template-columns: 120px 1fr 100px 120px;
     gap: 15px;
     align-items: center;
     padding: 12px 15px;
@@ -745,7 +745,7 @@
 
 @media (max-width: 900px) {
     .activity-row {
-        grid-template-columns: 50px 100px 1fr 100px;
+        grid-template-columns: 100px 1fr 100px;
         gap: 10px;
         font-size: 13px;
     }
