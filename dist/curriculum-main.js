@@ -703,5 +703,28 @@ window.initializeCurriculumResources = function() {
     
     console.log('[Curriculum Resources] Config loaded:', config);
     console.log('[Curriculum Resources] Ready for use on scene:', config.sceneKey);
+    
+    // TRIGGER PAGE 1 IMMEDIATELY since we're already on the scene
+    console.log('[Curriculum Resources] Triggering Page 1 initialization...');
+    
+    // Wait a moment for DOM to be ready
+    setTimeout(() => {
+        const viewContainer = document.querySelector(`#${config.viewKey}`) || 
+                            document.querySelector('.kn-scene') ||
+                            document.querySelector(`#kn-${config.sceneKey}`);
+        
+        if (viewContainer) {
+            console.log('[Curriculum Resources] View container found, triggering render');
+            // Manually trigger the scene render to init Page 1
+            $(document).trigger(`knack-scene-render.${config.sceneKey.replace('scene_', '')}`, { key: config.sceneKey });
+        } else {
+            console.error('[Curriculum Resources] View container not found. Looking for:', config.viewKey);
+            console.log('[Curriculum Resources] Available elements:', {
+                byViewId: !!document.querySelector(`#${config.viewKey}`),
+                bySceneClass: !!document.querySelector('.kn-scene'),
+                bySceneId: !!document.querySelector(`#kn-${config.sceneKey}`)
+            });
+        }
+    }, 500);
 };
 
