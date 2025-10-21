@@ -1,0 +1,1037 @@
+/**
+ * VESPA Curriculum Resources - Main Stylesheet
+ * Comprehensive styles for all three curriculum pages
+ * Desktop-first responsive design with mobile optimizations
+ */
+
+/* ===== GLOBAL STYLES ===== */
+
+:root {
+    --vespa-blue: #079baa;
+    --vespa-teal: #00e5db;
+    --vespa-dark-blue: #23356f;
+    --vespa-navy: #2a3c7a;
+    --vespa-light-blue: #7bd8d0;
+    --theme-vision: #FFA500;
+    --theme-effort: #a4c2f4;
+    --theme-systems: #aad950;
+    --theme-practice: #a986ff;
+    --theme-attitude: #ff769c;
+}
+
+/* Reset and base styles for curriculum pages */
+.curriculum-page {
+    font-family: 'Roboto', 'Lato', Arial, sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ===== PAGE 1: BOOK SELECTION ===== */
+
+#curriculum-books-container {
+    max-width: 1400px;
+    margin: 100px auto 50px;
+    padding: 40px 20px;
+}
+
+.curriculum-page-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.curriculum-page-header h1 {
+    color: var(--vespa-dark-blue);
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.curriculum-page-header p {
+    color: var(--vespa-blue);
+    font-size: 18px;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#curriculum-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 50px;
+    align-items: start;
+    justify-items: center;
+    padding: 20px 0;
+}
+
+.book-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid rgba(35, 53, 111, 0.1);
+    box-shadow: 0 10px 30px rgba(35, 53, 111, 0.1);
+    max-width: 450px;
+    width: 100%;
+}
+
+.book-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(35, 53, 111, 0.2);
+    border-color: var(--vespa-blue);
+}
+
+.book-card img {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(95, 73, 122, 0.3);
+    margin-bottom: 25px;
+}
+
+.book-card:hover img {
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 30px rgba(7, 155, 170, 0.4),
+        0 20px 40px rgba(35, 53, 111, 0.2);
+    border-color: var(--vespa-blue);
+}
+
+.book-card h2 {
+    color: var(--vespa-dark-blue);
+    font-size: 28px;
+    font-weight: 700;
+    margin: 20px 0 15px;
+}
+
+.book-progress {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(35, 53, 111, 0.1);
+}
+
+.progress-percentage {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--vespa-blue);
+    margin-bottom: 10px;
+}
+
+.progress-label {
+    font-size: 16px;
+    color: var(--vespa-blue);
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--vespa-blue) 0%, var(--vespa-teal) 100%);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-stats {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.book-card .btn-start {
+    margin-top: 20px;
+    background: linear-gradient(135deg, var(--vespa-blue) 0%, var(--vespa-teal) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(7, 155, 170, 0.3);
+}
+
+.book-card .btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(7, 155, 170, 0.4);
+    background: linear-gradient(135deg, var(--vespa-teal) 0%, var(--vespa-blue) 100%);
+}
+
+/* ===== PAGE 2: ACTIVITY BROWSER ===== */
+
+#activity-browser-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 100px 20px 50px;
+}
+
+.browser-header {
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+}
+
+.btn-back {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    background: transparent;
+    border: 2px solid var(--vespa-blue);
+    color: var(--vespa-blue);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: var(--vespa-blue);
+    color: white;
+}
+
+.browser-header h1 {
+    color: var(--vespa-dark-blue);
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.browser-subtitle {
+    color: var(--vespa-blue);
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.browser-content {
+    margin-top: 30px;
+}
+
+.browser-filters {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    padding: 25px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vespa-dark-blue);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.search-input,
+.filter-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: var(--vespa-blue);
+}
+
+.search-input {
+    font-size: 16px;
+}
+
+.month-group {
+    margin-bottom: 50px;
+}
+
+.month-header {
+    color: var(--vespa-dark-blue);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--vespa-blue);
+    position: relative;
+}
+
+.month-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background: var(--vespa-teal);
+}
+
+.activities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.activity-card {
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.activity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-color: var(--vespa-blue);
+}
+
+.activity-card.completed {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f8f4 100%);
+}
+
+.activity-card-header {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--vespa-blue);
+}
+
+.activity-theme-badge {
+    background-color: var(--vespa-blue);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-id {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+.activity-card-body {
+    padding: 20px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.activity-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--vespa-dark-blue);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.completed-badge {
+    display: inline-block;
+    background: #4caf50;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.activity-card-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-view-activity,
+.btn-start-activity {
+    width: 100%;
+    background: var(--vespa-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-view-activity:hover,
+.btn-start-activity:hover {
+    background: var(--vespa-teal);
+    transform: translateY(-2px);
+}
+
+.no-results {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.no-results h3 {
+    color: var(--vespa-dark-blue);
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.no-results p {
+    color: #666;
+    font-size: 18px;
+}
+
+/* ===== PAGE 3: ACTIVITY VIEWER ===== */
+
+#activity-viewer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px 50px;
+}
+
+.viewer-breadcrumbs {
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #666;
+}
+
+.viewer-breadcrumbs a {
+    color: var(--vespa-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.viewer-breadcrumbs a:hover {
+    color: var(--vespa-teal);
+    text-decoration: underline;
+}
+
+.viewer-breadcrumbs .separator {
+    margin: 0 10px;
+    color: #999;
+}
+
+.viewer-breadcrumbs .current {
+    color: #333;
+    font-weight: 500;
+}
+
+.activity-header {
+    margin-bottom: 30px;
+}
+
+.activity-meta {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.activity-id {
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.completed-badge-large {
+    background: #4caf50;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.activity-title {
+    color: var(--vespa-dark-blue);
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.activity-content-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.activity-iframe-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.activity-iframe-wrapper iframe {
+    width: 100%;
+    min-height: 500px;
+    border: none;
+    border-radius: 8px;
+}
+
+.activity-no-content {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.activity-pdf-download {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-download-pdf {
+    display: inline-block;
+    background: #ff6b35;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.btn-download-pdf:hover {
+    background: #ff8555;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.activity-completion-section {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.btn-complete {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 18px 50px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-complete:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-complete:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.completion-message {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+    border: 2px solid #4caf50;
+    border-radius: 12px;
+    padding: 20px 30px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2e7d32;
+    display: inline-block;
+}
+
+.completion-icon {
+    font-size: 28px;
+    margin-right: 10px;
+}
+
+.activity-discussions-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.discussions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.discussions-header h2 {
+    color: var(--vespa-dark-blue);
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.discussion-count {
+    color: var(--vespa-blue);
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.btn-toggle-discussions {
+    background: transparent;
+    border: 2px solid var(--vespa-blue);
+    color: var(--vespa-blue);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-discussions:hover {
+    background: var(--vespa-blue);
+    color: white;
+}
+
+.add-comment-form {
+    margin-bottom: 30px;
+}
+
+.comment-textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.comment-textarea:focus {
+    outline: none;
+    border-color: var(--vespa-blue);
+}
+
+.btn-add-comment {
+    background: var(--vespa-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-comment:hover:not(:disabled) {
+    background: var(--vespa-teal);
+}
+
+.btn-add-comment:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.no-discussions {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.discussions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.discussion-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid var(--vespa-blue);
+}
+
+.discussion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.discussion-author {
+    font-weight: 600;
+    color: var(--vespa-dark-blue);
+    font-size: 16px;
+}
+
+.discussion-date {
+    font-size: 14px;
+    color: #666;
+}
+
+.discussion-body {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.activity-navigation {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.btn-back-to-list {
+    background: transparent;
+    border: 2px solid var(--vespa-blue);
+    color: var(--vespa-blue);
+    padding: 15px 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-back-to-list:hover {
+    background: var(--vespa-blue);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ===== SHARED COMPONENTS ===== */
+
+/* Loading State */
+.curriculum-loading {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #e0e0e0;
+    border-top-color: var(--vespa-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.curriculum-loading p {
+    color: var(--vespa-blue);
+    font-size: 18px;
+}
+
+/* Error State */
+.curriculum-error {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.error-icon {
+    color: #c00;
+    margin-bottom: 20px;
+}
+
+.curriculum-error h3 {
+    font-size: 24px;
+    color: #c00;
+    margin: 20px 0;
+}
+
+.curriculum-error p {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.btn-retry {
+    background: var(--vespa-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-retry:hover {
+    background: var(--vespa-teal);
+}
+
+/* Success Toast */
+.success-toast {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: #4caf50;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+    font-size: 16px;
+    font-weight: 600;
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+}
+
+.success-toast.show {
+    transform: translateX(0);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.book-card,
+.activity-card {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.book-card:nth-child(1) { animation-delay: 0.1s; opacity: 0; }
+.book-card:nth-child(2) { animation-delay: 0.2s; opacity: 0; }
+.book-card:nth-child(3) { animation-delay: 0.3s; opacity: 0; }
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 1200px) {
+    #curriculum-books-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+    }
+    
+    .book-card img {
+        max-width: 300px;
+    }
+    
+    .activities-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Page 1 - Book Selection */
+    #curriculum-books-container {
+        margin-top: 50px;
+        padding: 20px 15px;
+    }
+    
+    #curriculum-books-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .curriculum-page-header h1 {
+        font-size: 32px;
+    }
+    
+    .book-card {
+        padding: 25px 20px;
+    }
+    
+    .book-card img {
+        max-width: 250px;
+    }
+    
+    /* Page 2 - Activity Browser */
+    #activity-browser-container {
+        padding-top: 80px;
+    }
+    
+    .browser-header h1 {
+        font-size: 28px;
+        margin-top: 50px;
+    }
+    
+    .btn-back {
+        position: relative;
+        left: auto;
+        top: auto;
+        margin-bottom: 20px;
+        display: block;
+        width: 100%;
+    }
+    
+    .browser-filters {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .filter-group {
+        min-width: 100%;
+    }
+    
+    .month-header {
+        font-size: 24px;
+    }
+    
+    .activities-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Page 3 - Activity Viewer */
+    #activity-viewer-container {
+        padding-top: 80px;
+    }
+    
+    .activity-title {
+        font-size: 26px;
+    }
+    
+    .activity-content-section {
+        padding: 20px 15px;
+    }
+    
+    .activity-iframe-wrapper iframe {
+        min-height: 350px;
+    }
+    
+    .btn-complete {
+        width: 100%;
+        font-size: 18px;
+        padding: 15px 20px;
+    }
+    
+    .activity-discussions-section {
+        padding: 20px 15px;
+    }
+    
+    .discussions-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .btn-toggle-discussions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .curriculum-page-header h1 {
+        font-size: 26px;
+    }
+    
+    .book-card h2 {
+        font-size: 22px;
+    }
+    
+    .progress-percentage {
+        font-size: 28px;
+    }
+    
+    .browser-header h1 {
+        font-size: 24px;
+    }
+    
+    .month-header {
+        font-size: 20px;
+    }
+    
+    .activity-name {
+        font-size: 16px;
+    }
+    
+    .activity-title {
+        font-size: 22px;
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+
+@media print {
+    .btn-back,
+    .btn-start,
+    .btn-view-activity,
+    .btn-complete,
+    .btn-download-pdf,
+    .btn-add-comment,
+    .btn-toggle-discussions,
+    .btn-back-to-list,
+    .browser-filters,
+    .viewer-breadcrumbs {
+        display: none !important;
+    }
+    
+    .activity-iframe-wrapper,
+    .activity-discussions-section {
+        page-break-inside: avoid;
+    }
+}
+
