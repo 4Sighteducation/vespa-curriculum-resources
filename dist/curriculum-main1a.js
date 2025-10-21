@@ -78,21 +78,41 @@ class CurriculumAPI {
 
     async getBooks() {
         if (this.isCacheValid('books')) {
+            console.log('[Curriculum API] Returning cached books:', this.cache.books);
             return this.cache.books;
         }
 
         try {
+            console.log('[Curriculum API] Fetching books from object_56...');
             const records = await this.fetchFromKnack('object_56');
-            this.cache.books = records.map(record => ({
-                id: record.id,
-                name: record.field_1429,
-                imageUrl: this.extractImageUrl(record.field_1439_raw || record.field_1439),
-                imageHtml: record.field_1439
-            }));
+            console.log('[Curriculum API] Raw book records:', records);
+            console.log('[Curriculum API] Number of book records:', records.length);
+            
+            if (records.length > 0) {
+                console.log('[Curriculum API] Sample book record:', records[0]);
+                console.log('[Curriculum API] Available fields:', Object.keys(records[0]));
+            }
+            
+            this.cache.books = records.map(record => {
+                const book = {
+                    id: record.id,
+                    name: record.field_1429,
+                    imageUrl: this.extractImageUrl(record.field_1439_raw || record.field_1439),
+                    imageHtml: record.field_1439
+                };
+                console.log('[Curriculum API] Mapped book:', book);
+                return book;
+            });
+            
             this.cache.lastFetch.books = Date.now();
+            console.log('[Curriculum API] Books cached successfully:', this.cache.books);
             return this.cache.books;
         } catch (error) {
             console.error('[Curriculum API] Failed to fetch books:', error);
+            console.error('[Curriculum API] Error details:', {
+                message: error.message,
+                stack: error.stack
+            });
             return [];
         }
     }
