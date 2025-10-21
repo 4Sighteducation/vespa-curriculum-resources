@@ -1,0 +1,1031 @@
+{
+  "metadata": {
+    "source_student_file": "vespa-problem-activity-mappings1a.json",
+    "source_tutor_file": "tutoractivities_pretty_mapped_with_mappings.json",
+    "generated": "now",
+    "notes": "Includes both tutor_activity_ids and tutor_record_ids."
+  },
+  "problem_to_tutor": {
+    "svision_1": {
+      "dimension": "Vision",
+      "problem_id": "svision_1",
+      "problem_text": "I'm unsure about my future goals",
+      "recommendedActivities": [
+        "21st Birthday",
+        "Roadmap",
+        "Personal Compass",
+        "Perfect Day"
+      ],
+      "tutor_activity_ids": [
+        13,
+        16,
+        62,
+        72
+      ],
+      "tutor_record_ids": [
+        "607f34fe3b9a8f001d79f9b6",
+        "607767a0d66606001b48d065",
+        "6077674ef1b3ad001b5309f9",
+        "607f3b19e913fa001c6aca83"
+      ],
+      "student_activity_ids": [
+        "5fcd3fa0a8369b001b9fa1cf",
+        "5ffe00e19ff689001bcb12ce",
+        "5ffdfd68226f20001b05eb8f",
+        "5fcd49ed0e734a001db4166f"
+      ]
+    },
+    "svision_2": {
+      "dimension": "Vision",
+      "problem_id": "svision_2",
+      "problem_text": "I'm not feeling motivated for my studies",
+      "recommendedActivities": [
+        "Motivation Diamond",
+        "Five Roads",
+        "Mission & Medal",
+        "What's Stopping You"
+      ],
+      "tutor_activity_ids": [
+        12,
+        14,
+        30,
+        44
+      ],
+      "tutor_record_ids": [
+        "607766eed66606001b48d001",
+        "607aded8f8ed44001c7b37f1",
+        "60776765a41503001b5a558e",
+        "607ae37c067d36001b5fca2d"
+      ],
+      "student_activity_ids": [
+        "5ffdfc0d1e82a6001e41e96e",
+        "5ffe01865c1cca001b161e42",
+        "5ffe06d11e82a6001e41f3eb",
+        "5ffdffb386917a001be0853a"
+      ]
+    },
+    "svision_3": {
+      "dimension": "Vision",
+      "problem_id": "svision_3",
+      "problem_text": "I can't see how school connects to my future",
+      "recommendedActivities": [
+        "Success Leaves Clues",
+        "There and Back",
+        "20 Questions",
+        "SMART Goals"
+      ],
+      "tutor_activity_ids": [
+        28,
+        52,
+        73,
+        90
+      ],
+      "tutor_record_ids": [
+        "607adccdb9af42001b0d5885",
+        "607f3f8f2e418a0021b82a33",
+        "607f2e2f2b0bda001ccd23a6",
+        "607f3b563b9a8f001d79fea3"
+      ],
+      "student_activity_ids": [
+        "5ffc7453482dc4001cf6730d",
+        "5ff36ee0f46ecd001bcafaa4",
+        "5fcb62a903d876001c5e1fcf",
+        "5fcd52daa8369b001b9fb551"
+      ]
+    },
+    "svision_4": {
+      "dimension": "Vision",
+      "problem_id": "svision_4",
+      "problem_text": "I don't really know what success looks like for me",
+      "recommendedActivities": [
+        "Perfect Day",
+        "Fix your dashboard",
+        "Getting Dreams Done",
+        "Personal Compass"
+      ],
+      "tutor_activity_ids": [
+        13,
+        53,
+        67,
+        72
+      ],
+      "tutor_record_ids": [
+        "607f3b19e913fa001c6aca83",
+        "607f39df2e418a0021b825ba",
+        "607f2e4e0f0db5001c462847",
+        "6077674ef1b3ad001b5309f9"
+      ],
+      "student_activity_ids": [
+        "5fcd49ed0e734a001db4166f",
+        "5fcd52390dcf37001c0cc901",
+        "5fcd2a08a8369b001b9f8883",
+        "5ffdfd68226f20001b05eb8f"
+      ]
+    },
+    "svision_5": {
+      "dimension": "Vision",
+      "problem_id": "svision_5",
+      "problem_text": "I haven't thought about what I want to achieve this year",
+      "recommendedActivities": [
+        "SMART Goals",
+        "Roadmap",
+        "Mental Contrasting",
+        "21st Birthday"
+      ],
+      "tutor_activity_ids": [
+        16,
+        62,
+        73,
+        82
+      ],
+      "tutor_record_ids": [
+        "607f3b563b9a8f001d79fea3",
+        "607767a0d66606001b48d065",
+        "607f3e1b34c775001bf719b0",
+        "607f34fe3b9a8f001d79f9b6"
+      ],
+      "student_activity_ids": [
+        "5fcd52daa8369b001b9fb551",
+        "5ffe00e19ff689001bcb12ce",
+        "5fcf4ac1e54816001f9c60ce",
+        "5fcd3fa0a8369b001b9fa1cf"
+      ]
+    },
+    "svision_6": {
+      "dimension": "Vision",
+      "problem_id": "svision_6",
+      "problem_text": "I find it hard to picture myself doing well",
+      "recommendedActivities": [
+        "Fake It!",
+        "Perfect Day",
+        "Inner Story Telling",
+        "Force Field"
+      ],
+      "tutor_activity_ids": [
+        66,
+        69,
+        72,
+        77
+      ],
+      "tutor_record_ids": [
+        "607f3d0f34c775001bf7184a",
+        "607f3b19e913fa001c6aca83",
+        "607f3a0f99ff4b001b9b33c8",
+        "607f37edc95d72001ecc1667"
+      ],
+      "student_activity_ids": [
+        "5fcd517ba74fa2001bd48dad",
+        "5fcd49ed0e734a001db4166f",
+        "5fd5217af9fddc001cf453e5",
+        "5ff3841848789d001c52ed81"
+      ]
+    },
+    "svision_7": {
+      "dimension": "Vision",
+      "problem_id": "svision_7",
+      "problem_text": "I rarely think about where I'm heading or why I'm here",
+      "recommendedActivities": [
+        "Personal Compass",
+        "Five Roads",
+        "One to Ten",
+        "20 Questions"
+      ],
+      "tutor_activity_ids": [
+        13,
+        30,
+        52,
+        54
+      ],
+      "tutor_record_ids": [
+        "6077674ef1b3ad001b5309f9",
+        "607aded8f8ed44001c7b37f1",
+        "607f2e922b0bda001ccd240a",
+        "607f2e2f2b0bda001ccd23a6"
+      ],
+      "student_activity_ids": [
+        "5ffdfd68226f20001b05eb8f",
+        "5ffe01865c1cca001b161e42",
+        "5fd01084e2bca3001bbe0283",
+        "5fcb62a903d876001c5e1fcf"
+      ]
+    },
+    "seffort_1": {
+      "dimension": "Effort",
+      "problem_id": "seffort_1",
+      "problem_text": "I struggle to complete my homework on time",
+      "recommendedActivities": [
+        "Weekly Planner",
+        "25min Sprints",
+        "Priority Matrix",
+        "Now vs Most"
+      ],
+      "tutor_activity_ids": [
+        17,
+        37,
+        47,
+        48
+      ],
+      "tutor_record_ids": [
+        "607767d4a41503001b5a55cb",
+        "607ae12bb9af42001b0d5c9c",
+        "607ae4b9585f77001bc1b468",
+        "607ae480f8ed44001c7b3cc5"
+      ],
+      "student_activity_ids": [
+        "5ffe0b461e82a6001e41f77d",
+        "5ffe05c11e82a6001e41f2c5",
+        "5ffe0d2186917a001be091a6",
+        "5ffe02d95d4ee5001c30f11d"
+      ]
+    },
+    "seffort_2": {
+      "dimension": "Effort",
+      "problem_id": "seffort_2",
+      "problem_text": "I find it hard to keep trying when things get difficult",
+      "recommendedActivities": [
+        "Will vs Skill",
+        "Effort Thermometer",
+        "Looking under Rocks",
+        "Kill Your Critic"
+      ],
+      "tutor_activity_ids": [
+        24,
+        35,
+        39,
+        60
+      ],
+      "tutor_record_ids": [
+        "607ae195067d36001b5fc89b",
+        "607ae0cc76f731001b3b2d90",
+        "607ada68585f77001bc1aa47",
+        "607f31810f0db5001c462b24"
+      ],
+      "student_activity_ids": [
+        "5ffe108e5c1cca001b162b8c",
+        "5ffe09d15d4ee5001c30f799",
+        "5ffe07ef1e82a6001e41f4cf",
+        "5ffdfaed86917a001be07f6f"
+      ]
+    },
+    "seffort_3": {
+      "dimension": "Effort",
+      "problem_id": "seffort_3",
+      "problem_text": "I often give up if I don't get things right straight away",
+      "recommendedActivities": [
+        "Failing Forwards",
+        "Growth Mindset",
+        "2 Slow, 1 Fast",
+        "Learn from Mistakes"
+      ],
+      "tutor_activity_ids": [
+        15,
+        71,
+        75,
+        89
+      ],
+      "tutor_record_ids": [
+        "607f3bce508623001e2f50a3",
+        "60776785f1b3ad001b530a15",
+        "607f3f48e913fa001c6acde1",
+        "607f3a42e913fa001c6ac9ed"
+      ],
+      "student_activity_ids": [
+        "6005d84a236fdb001eb25437",
+        "5ffe1476226f20001b060044",
+        "5fed8f7f8ff75c001b6ebd5f",
+        "5fecf758845cf7001bd26679"
+      ]
+    },
+    "seffort_4": {
+      "dimension": "Effort",
+      "problem_id": "seffort_4",
+      "problem_text": "I do the bare minimum just to get by",
+      "recommendedActivities": [
+        "Effort Thermometer",
+        "Mission & Medal",
+        "Working Weeks",
+        "The Bottom Left"
+      ],
+      "tutor_activity_ids": [
+        14,
+        33,
+        35,
+        78
+      ],
+      "tutor_record_ids": [
+        "607ae0cc76f731001b3b2d90",
+        "60776765a41503001b5a558e",
+        "607f3d230f0db5001c463714",
+        "607adfb477a5c5001bd41a42"
+      ],
+      "student_activity_ids": [
+        "5ffe09d15d4ee5001c30f799",
+        "5ffe06d11e82a6001e41f3eb",
+        "5fd626af3f7ed1001b80b269",
+        "5ffe0dd186917a001be0923d"
+      ]
+    },
+    "seffort_5": {
+      "dimension": "Effort",
+      "problem_id": "seffort_5",
+      "problem_text": "I get distracted really easily when I try to study",
+      "recommendedActivities": [
+        "High Flow Spaces",
+        "Types of Attention",
+        "Pre-Made Decisions",
+        "Chunking Steps"
+      ],
+      "tutor_activity_ids": [
+        19,
+        22,
+        46,
+        51
+      ],
+      "tutor_record_ids": [
+        "607ae44bb9af42001b0d5f19",
+        "607ada05585f77001bc1a9e1",
+        "607ae5e876f731001b3b31de",
+        "607acfdb841fde001b9dfffc"
+      ],
+      "student_activity_ids": [
+        "5ffe11ac86917a001be095b6",
+        "5ffe0eb05d4ee5001c30fbdb",
+        "5ffe09425c1cca001b16253e",
+        "5ffe0fa4aaec95001b10f70b"
+      ]
+    },
+    "seffort_6": {
+      "dimension": "Effort",
+      "problem_id": "seffort_6",
+      "problem_text": "I avoid topics or tasks that feel too hard",
+      "recommendedActivities": [
+        "Will vs Skill",
+        "Looking under Rocks",
+        "2 Slow, 1 Fast",
+        "The Lead Domino"
+      ],
+      "tutor_activity_ids": [
+        24,
+        39,
+        80,
+        89
+      ],
+      "tutor_record_ids": [
+        "607ae195067d36001b5fc89b",
+        "607ada68585f77001bc1aa47",
+        "607f3f48e913fa001c6acde1",
+        "607f3d563b9a8f001d7a0032"
+      ],
+      "student_activity_ids": [
+        "5ffe108e5c1cca001b162b8c",
+        "5ffe07ef1e82a6001e41f4cf",
+        "5fed8f7f8ff75c001b6ebd5f",
+        "5fe0ec9d45b5d5001bb535f8"
+      ]
+    },
+    "seffort_7": {
+      "dimension": "Effort",
+      "problem_id": "seffort_7",
+      "problem_text": "I put things off until I'm under pressure",
+      "recommendedActivities": [
+        "10min Rule",
+        "Frogs & Bannisters",
+        "Now vs Most",
+        "25min Sprints"
+      ],
+      "tutor_activity_ids": [
+        37,
+        47,
+        64,
+        68
+      ],
+      "tutor_record_ids": [
+        "607f39f9e913fa001c6ac9b6",
+        "607f35fc0f0db5001c463087",
+        "607ae480f8ed44001c7b3cc5",
+        "607ae12bb9af42001b0d5c9c"
+      ],
+      "student_activity_ids": [
+        "5fd5197510f706001b0465d6",
+        "5fd50afe5dbce5001b882d67",
+        "5ffe02d95d4ee5001c30f11d",
+        "5ffe05c11e82a6001e41f2c5"
+      ]
+    },
+    "ssystems_1": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_1",
+      "problem_text": "I'm not very organized with my notes and deadlines",
+      "recommendedActivities": [
+        "Weekly Planner",
+        "Priority Matrix",
+        "STQR",
+        "Graphic Organisers"
+      ],
+      "tutor_activity_ids": [
+        17,
+        48,
+        74,
+        81
+      ],
+      "tutor_record_ids": [
+        "607767d4a41503001b5a55cb",
+        "607ae4b9585f77001bc1b468",
+        "607f3baa3b9a8f001d79fedf",
+        "607f3d6c0f0db5001c46374f"
+      ],
+      "student_activity_ids": [
+        "5ffe0b461e82a6001e41f77d",
+        "5ffe0d2186917a001be091a6",
+        "5fe28f3c514b63001bb3a768",
+        "5fec5dc532f5b1001bb756bf"
+      ]
+    },
+    "ssystems_2": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_2",
+      "problem_text": "I don't have a good revision plan",
+      "recommendedActivities": [
+        "Leitner Box",
+        "Revision Questionnaire",
+        "Spaced Practice",
+        "2-4-8 Rule"
+      ],
+      "tutor_activity_ids": [
+        25,
+        42,
+        61,
+        70,
+        88
+      ],
+      "tutor_record_ids": [
+        "607f3f31c95d72001ecc1c3f",
+        "607f31b32e418a0021b81dff",
+        "607adbce76f731001b3b2805",
+        "607ae31e76f731001b3b2f82",
+        "607f3a2999ff4b001b9b33e1"
+      ],
+      "student_activity_ids": [
+        "5fe8d54dc4627e001b8ccd12",
+        "5fe8ca680c7c48001bd7db56",
+        "5ffe101f226f20001b05fcd4",
+        "5fe0dcf4590766001ba431cf"
+      ]
+    },
+    "ssystems_3": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_3",
+      "problem_text": "I keep forgetting what homework I have",
+      "recommendedActivities": [
+        "Weekly Planner",
+        "Rule of 3",
+        "Project Progress Chart",
+        "Packing Bags"
+      ],
+      "tutor_activity_ids": [
+        17,
+        18,
+        36,
+        86
+      ],
+      "tutor_record_ids": [
+        "607767d4a41503001b5a55cb",
+        "607767e7ef7b4f001cd281ab",
+        "607f3ef9c95d72001ecc1c15",
+        "607ae0f6585f77001bc1b122"
+      ],
+      "student_activity_ids": [
+        "5ffe0b461e82a6001e41f77d",
+        "5ffe054a5d4ee5001c30f3a1",
+        "5fe2940aafeba3001dcc5f77",
+        "5ffe0876226f20001b05f671"
+      ]
+    },
+    "ssystems_4": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_4",
+      "problem_text": "I leave everything to the last minute",
+      "recommendedActivities": [
+        "Eisenhower Matrix",
+        "Priority Matrix",
+        "The Lead Domino",
+        "10min Rule"
+      ],
+      "tutor_activity_ids": [
+        48,
+        68,
+        80,
+        87
+      ],
+      "tutor_record_ids": [
+        "607f3f1a99ff4b001b9b37e1",
+        "607ae4b9585f77001bc1b468",
+        "607f3d563b9a8f001d7a0032",
+        "607f39f9e913fa001c6ac9b6"
+      ],
+      "student_activity_ids": [
+        "5fe38371c76bfd001b459923",
+        "5ffe0d2186917a001be091a6",
+        "5fe0ec9d45b5d5001bb535f8",
+        "5fd5197510f706001b0465d6"
+      ]
+    },
+    "ssystems_5": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_5",
+      "problem_text": "I don't use a planner or calendar to track my work",
+      "recommendedActivities": [
+        "Weekly Planner",
+        "Project Progress Chart",
+        "Working Weeks",
+        "Rule of 3"
+      ],
+      "tutor_activity_ids": [
+        17,
+        18,
+        78,
+        86
+      ],
+      "tutor_record_ids": [
+        "607767d4a41503001b5a55cb",
+        "607f3ef9c95d72001ecc1c15",
+        "607f3d230f0db5001c463714",
+        "607767e7ef7b4f001cd281ab"
+      ],
+      "student_activity_ids": [
+        "5ffe0b461e82a6001e41f77d",
+        "5fe2940aafeba3001dcc5f77",
+        "5fd626af3f7ed1001b80b269",
+        "5ffe054a5d4ee5001c30f3a1"
+      ]
+    },
+    "ssystems_6": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_6",
+      "problem_text": "My notes are all over the place and hard to follow",
+      "recommendedActivities": [
+        "Graphic Organisers",
+        "STQR",
+        "Right-Wrong-Right",
+        "Chunking Steps"
+      ],
+      "tutor_activity_ids": [
+        19,
+        74,
+        76,
+        81
+      ],
+      "tutor_record_ids": [
+        "607f3d6c0f0db5001c46374f",
+        "607f3baa3b9a8f001d79fedf",
+        "607f3bf40f0db5001c463537",
+        "607acfdb841fde001b9dfffc"
+      ],
+      "student_activity_ids": [
+        "5fec5dc532f5b1001bb756bf",
+        "5fe28f3c514b63001bb3a768",
+        "5feb62388fd0f4001b0e9d04",
+        "5ffe0fa4aaec95001b10f70b"
+      ]
+    },
+    "ssystems_7": {
+      "dimension": "Systems",
+      "problem_id": "ssystems_7",
+      "problem_text": "I struggle to prioritise what to do first",
+      "recommendedActivities": [
+        "Priority Matrix",
+        "Eisenhower Matrix",
+        "The Lead Domino",
+        "Now vs Most"
+      ],
+      "tutor_activity_ids": [
+        47,
+        48,
+        80,
+        87
+      ],
+      "tutor_record_ids": [
+        "607ae4b9585f77001bc1b468",
+        "607f3f1a99ff4b001b9b37e1",
+        "607f3d563b9a8f001d7a0032",
+        "607ae480f8ed44001c7b3cc5"
+      ],
+      "student_activity_ids": [
+        "5ffe0d2186917a001be091a6",
+        "5fe38371c76bfd001b459923",
+        "5fe0ec9d45b5d5001bb535f8",
+        "5ffe02d95d4ee5001c30f11d"
+      ]
+    },
+    "spractice_1": {
+      "dimension": "Practice",
+      "problem_id": "spractice_1",
+      "problem_text": "I don't review my work regularly",
+      "recommendedActivities": [
+        "Test Yourself",
+        "Spaced Practice",
+        "Leitner Box",
+        "2-4-8 Rule"
+      ],
+      "tutor_activity_ids": [
+        42,
+        43,
+        70,
+        88
+      ],
+      "tutor_record_ids": [
+        "607ae352585f77001bc1b318",
+        "607ae31e76f731001b3b2f82",
+        "607f3f31c95d72001ecc1c3f",
+        "607f3a2999ff4b001b9b33e1"
+      ],
+      "student_activity_ids": [
+        "5ffe134d1e82a6001e41ffe7",
+        "5ffe101f226f20001b05fcd4",
+        "5fe8d54dc4627e001b8ccd12",
+        "5fe0dcf4590766001ba431cf"
+      ]
+    },
+    "spractice_2": {
+      "dimension": "Practice",
+      "problem_id": "spractice_2",
+      "problem_text": "I tend to cram before tests",
+      "recommendedActivities": [
+        "Revision Questionnaire",
+        "Spaced Practice",
+        "Snack Don't Binge",
+        "2-4-8 Rule"
+      ],
+      "tutor_activity_ids": [
+        25,
+        42,
+        61,
+        65,
+        70
+      ],
+      "tutor_record_ids": [
+        "607f31b32e418a0021b81dff",
+        "607adbce76f731001b3b2805",
+        "607ae31e76f731001b3b2f82",
+        "607f37bf0f0db5001c4631ed",
+        "607f3a2999ff4b001b9b33e1"
+      ],
+      "student_activity_ids": [
+        "5fe8ca680c7c48001bd7db56",
+        "5ffe101f226f20001b05fcd4",
+        "5fe08034a529d3001b2b5b29",
+        "5fe0dcf4590766001ba431cf"
+      ]
+    },
+    "spractice_3": {
+      "dimension": "Practice",
+      "problem_id": "spractice_3",
+      "problem_text": "I avoid practising topics I find hard",
+      "recommendedActivities": [
+        "Will vs Skill",
+        "2 Slow, 1 Fast",
+        "Looking under Rocks",
+        "The Bottom Left"
+      ],
+      "tutor_activity_ids": [
+        24,
+        33,
+        39,
+        89
+      ],
+      "tutor_record_ids": [
+        "607ae195067d36001b5fc89b",
+        "607f3f48e913fa001c6acde1",
+        "607ada68585f77001bc1aa47",
+        "607adfb477a5c5001bd41a42"
+      ],
+      "student_activity_ids": [
+        "5ffe108e5c1cca001b162b8c",
+        "5fed8f7f8ff75c001b6ebd5f",
+        "5ffe07ef1e82a6001e41f4cf",
+        "5ffe0dd186917a001be0923d"
+      ]
+    },
+    "spractice_4": {
+      "dimension": "Practice",
+      "problem_id": "spractice_4",
+      "problem_text": "I'm not sure how to revise effectively",
+      "recommendedActivities": [
+        "Time to Teach",
+        "9 Box Grid",
+        "Practice Questionnaire",
+        "Test Yourself"
+      ],
+      "tutor_activity_ids": [
+        25,
+        27,
+        38,
+        43,
+        61
+      ],
+      "tutor_record_ids": [
+        "607adc49067d36001b5fc2d5",
+        "607ae157067d36001b5fc860",
+        "607f31b32e418a0021b81dff",
+        "607adbce76f731001b3b2805",
+        "607ae352585f77001bc1b318"
+      ],
+      "student_activity_ids": [
+        "5ffe12c89ff689001bcb2281",
+        "5ffe111a1e82a6001e41fe2b",
+        "5ffe0fa4aaec95001b10f70b",
+        "5ffe134d1e82a6001e41ffe7"
+      ]
+    },
+    "spractice_5": {
+      "dimension": "Practice",
+      "problem_id": "spractice_5",
+      "problem_text": "I don't practise exam-style questions enough",
+      "recommendedActivities": [
+        "Test Yourself",
+        "Know the Skills",
+        "Mechanical vs Flexible",
+        "Right-Wrong-Right"
+      ],
+      "tutor_activity_ids": [
+        43,
+        76,
+        83,
+        85
+      ],
+      "tutor_record_ids": [
+        "607ae352585f77001bc1b318",
+        "607f3e2fe913fa001c6accf2",
+        "607f3e5c3b9a8f001d7a0106",
+        "607f3bf40f0db5001c463537"
+      ],
+      "student_activity_ids": [
+        "5ffe134d1e82a6001e41ffe7",
+        "5fedaf2e19a8b7001c29cace",
+        "5fedc39cf3be06001b6ddbe3",
+        "5feb62388fd0f4001b0e9d04"
+      ]
+    },
+    "spractice_6": {
+      "dimension": "Practice",
+      "problem_id": "spractice_6",
+      "problem_text": "I don't really learn from the mistakes I make",
+      "recommendedActivities": [
+        "Failing Forwards",
+        "Learn from Mistakes",
+        "Right-Wrong-Right",
+        "Problem Solving"
+      ],
+      "tutor_activity_ids": [
+        40,
+        71,
+        75,
+        76
+      ],
+      "tutor_record_ids": [
+        "607f3bce508623001e2f50a3",
+        "607f3a42e913fa001c6ac9ed",
+        "607f3bf40f0db5001c463537",
+        "607ae2dd585f77001bc1b2c1"
+      ],
+      "student_activity_ids": [
+        "6005d84a236fdb001eb25437",
+        "5fecf758845cf7001bd26679",
+        "5feb62388fd0f4001b0e9d04",
+        "5ffe13feaaec95001b10fa95"
+      ]
+    },
+    "spractice_7": {
+      "dimension": "Practice",
+      "problem_id": "spractice_7",
+      "problem_text": "I rarely check my understanding before moving on",
+      "recommendedActivities": [
+        "Test Yourself",
+        "Independent Learning",
+        "9 Box Grid",
+        "Time to Teach"
+      ],
+      "tutor_activity_ids": [
+        21,
+        27,
+        38,
+        43
+      ],
+      "tutor_record_ids": [
+        "607ae352585f77001bc1b318",
+        "607ad9ad067d36001b5fc030",
+        "607ae157067d36001b5fc860",
+        "607adc49067d36001b5fc2d5"
+      ],
+      "student_activity_ids": [
+        "5ffe134d1e82a6001e41ffe7",
+        "5ffe12545d4ee5001c30fefa",
+        "5ffe111a1e82a6001e41fe2b",
+        "5ffe12c89ff689001bcb2281"
+      ]
+    },
+    "sattitude_1": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_1",
+      "problem_text": "I worry I'm not smart enough",
+      "recommendedActivities": [
+        "Growth Mindset",
+        "The Battery",
+        "Managing Reactions",
+        "Stopping Negative Thoughts"
+      ],
+      "tutor_activity_ids": [
+        15,
+        32,
+        34,
+        84
+      ],
+      "tutor_record_ids": [
+        "60776785f1b3ad001b530a15",
+        "607adf83f8ed44001c7b3887",
+        "607ae00b76f731001b3b2ced",
+        "607f3e432e418a0021b82929"
+      ],
+      "student_activity_ids": [
+        "5ffe1476226f20001b060044",
+        "5ffe15ccf6034a001b98b749",
+        "5ffe1700f6034a001b98b834",
+        "6005f0b6041501001c676cb8"
+      ]
+    },
+    "sattitude_2": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_2",
+      "problem_text": "I get easily discouraged by setbacks",
+      "recommendedActivities": [
+        "Failing Forwards",
+        "Benefit Finding",
+        "Change Curve",
+        "The First Aid Kit"
+      ],
+      "tutor_activity_ids": [
+        49,
+        50,
+        55,
+        75
+      ],
+      "tutor_record_ids": [
+        "607f3bce508623001e2f50a3",
+        "607ae4f2b9af42001b0d5fc2",
+        "607f2ec434c775001bf70a12",
+        "607ae59a067d36001b5fcc19"
+      ],
+      "student_activity_ids": [
+        "6005d84a236fdb001eb25437",
+        "5ffe169f656c5e001c712382",
+        "5fef592f648880001c1b7296",
+        "5ffe16205c1cca001b162fe2"
+      ]
+    },
+    "sattitude_3": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_3",
+      "problem_text": "I often compare myself to others and feel behind",
+      "recommendedActivities": [
+        "The Battery",
+        "Network Audits",
+        "Vampire Test",
+        "One to Ten"
+      ],
+      "tutor_activity_ids": [
+        23,
+        32,
+        54,
+        56
+      ],
+      "tutor_record_ids": [
+        "607adf83f8ed44001c7b3887",
+        "607ada3f76f731001b3b2683",
+        "607f2f0434c775001bf70a4d",
+        "607f2e922b0bda001ccd240a"
+      ],
+      "student_activity_ids": [
+        "5ffe15ccf6034a001b98b749",
+        "5ffe15505c1cca001b162f4b",
+        "5ff1f0b28a0c35001c57fb89",
+        "5fd01084e2bca3001bbe0283"
+      ]
+    },
+    "sattitude_4": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_4",
+      "problem_text": "I don't believe my effort really makes a difference",
+      "recommendedActivities": [
+        "Growth Mindset",
+        "Effort Thermometer",
+        "Force Field",
+        "Will vs Skill"
+      ],
+      "tutor_activity_ids": [
+        15,
+        35,
+        39,
+        66
+      ],
+      "tutor_record_ids": [
+        "60776785f1b3ad001b530a15",
+        "607ae0cc76f731001b3b2d90",
+        "607f37edc95d72001ecc1667",
+        "607ae195067d36001b5fc89b"
+      ],
+      "student_activity_ids": [
+        "5ffe1476226f20001b060044",
+        "5ffe09d15d4ee5001c30f799",
+        "5ff3841848789d001c52ed81",
+        "5ffe108e5c1cca001b162b8c"
+      ]
+    },
+    "sattitude_5": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_5",
+      "problem_text": "I feel overwhelmed when I don't get something straight away",
+      "recommendedActivities": [
+        "The First Aid Kit",
+        "Stand Tall",
+        "Managing Reactions",
+        "Power of If"
+      ],
+      "tutor_activity_ids": [
+        34,
+        50,
+        79,
+        91
+      ],
+      "tutor_record_ids": [
+        "607ae59a067d36001b5fcc19",
+        "607f3fa899ff4b001b9b3846",
+        "607ae00b76f731001b3b2ced",
+        "607f3d38e913fa001c6acc10"
+      ],
+      "student_activity_ids": [
+        "5ffe16205c1cca001b162fe2",
+        "6005de7c1e85bf001c4c451e",
+        "5ffe1700f6034a001b98b834",
+        "5fd52773ccb3a3002350961d"
+      ]
+    },
+    "sattitude_6": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_6",
+      "problem_text": "I tell myself I'm just not good at certain subjects",
+      "recommendedActivities": [
+        "Growth Mindset",
+        "Stopping Negative Thoughts",
+        "Kill Your Critic",
+        "Fake It!"
+      ],
+      "tutor_activity_ids": [
+        15,
+        60,
+        77,
+        84
+      ],
+      "tutor_record_ids": [
+        "60776785f1b3ad001b530a15",
+        "607f3e432e418a0021b82929",
+        "607f31810f0db5001c462b24",
+        "607f3d0f34c775001bf7184a"
+      ],
+      "student_activity_ids": [
+        "5ffe1476226f20001b060044",
+        "6005f0b6041501001c676cb8",
+        "5ffdfaed86917a001be07f6f",
+        "5fcd517ba74fa2001bd48dad"
+      ]
+    },
+    "sattitude_7": {
+      "dimension": "Attitude",
+      "problem_id": "sattitude_7",
+      "problem_text": "I find it hard to stay positive about school",
+      "recommendedActivities": [
+        "Network Audits",
+        "The Battery",
+        "Vampire Test",
+        "Benefit Finding"
+      ],
+      "tutor_activity_ids": [
+        23,
+        32,
+        49,
+        56
+      ],
+      "tutor_record_ids": [
+        "607ada3f76f731001b3b2683",
+        "607adf83f8ed44001c7b3887",
+        "607f2f0434c775001bf70a4d",
+        "607ae4f2b9af42001b0d5fc2"
+      ],
+      "student_activity_ids": [
+        "5ffe15505c1cca001b162f4b",
+        "5ffe15ccf6034a001b98b749",
+        "5ff1f0b28a0c35001c57fb89",
+        "5ffe169f656c5e001c712382"
+      ]
+    }
+  }
+}
