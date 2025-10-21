@@ -1,0 +1,196 @@
+/**
+ * VESPA Curriculum SPA v2.0 - Part 3: Activity Viewer & Init
+ */
+
+// ===== PAGE 3: ACTIVITY VIEWER =====
+const Page3 = {
+    async load(api, activity) {
+        const container = document.getElementById('page-viewer');
+        if (!container) return;
+        
+        container.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading activity...</p></div>';
+        
+        try {
+            const [discussions, completions] = await Promise.all([
+                api.getDiscussions(activity.id),
+                api.getUserCompletions()
+            ]);
+            
+            const isCompleted = completions.length > 0 && 
+                               (completions[0].activitiesCompleted[AppState.currentBook] || []).includes(activity.id);
+            
+            this.render(activity, discussions, isCompleted, api);
+        } catch (error) {
+            container.innerHTML = '<div class="error-state"><h3>Failed to load activity</h3></div>';
+        }
+    },
+    
+    render(activity, discussions, isCompleted, api) {
+        const container = document.getElementById('page-viewer');
+        const iframe = Utils.extractIframe(activity.content);
+        const pdfLink = Utils.extractPdfLink(activity.content);
+        
+        container.innerHTML = `
+            <div class="viewer-header">
+                <div class="breadcrumbs">
+                    <a href="#" onclick="AppState.setPage('books'); return false;">📚 Books</a> › 
+                    <a href="#" onclick="AppState.setPage('browser'); return false;">${AppState.currentBook}</a> › 
+                    <span>${activity.name}</span>
+                </div>
+                
+                <div class="activity-meta">
+                    <span class="meta-badge">#${activity.activityId}</span>
+                    <span class="meta-badge theme-badge" style="background: ${Utils.getThemeColor(activity.theme)}">${activity.theme}</span>
+                    ${isCompleted ? '<span class="meta-badge completed-large">✓ Completed</span>' : ''}
+                </div>
+                
+                <h1 class="activity-title">${activity.name}</h1>
+            </div>
+            
+            <div class="content-section">
+                ${iframe ? `<div class="activity-iframe">${iframe}</div>` : '<p style="text-align:center; color: #999;">No embedded content</p>'}
+                ${pdfLink ? `<div class="pdf-download"><a href="${pdfLink}" target="_blank" class="btn-pdf">📄 Download PDF</a></div>` : ''}
+            </div>
+            
+            <div class="completion-section">
+                ${isCompleted 
+                    ? '<div class="completed-message">✓ You completed this activity</div>'
+                    : '<button class="btn-complete" onclick="Page3.complete()">✓ Complete and Continue</button>'}
+            </div>
+            
+            <div class="discussions-section">
+                <div class="discussions-header">
+                    <h2>Discussion <span style="color: var(--vespa-blue)">(${discussions.length})</span></h2>
+                </div>
+                
+                <div class="comment-form">
+                    <textarea id="new-comment" class="comment-textarea" rows="3" placeholder="Share your thoughts on this activity..."></textarea>
+                    <button class="btn-post-comment" onclick="Page3.addComment()">Post Comment</button>
+                </div>
+                
+                <div id="discussions-list">
+                    ${discussions.length === 0 
+                        ? '<p style="text-align:center; color: #999; padding: 30px;">No comments yet. Be the first!</p>'
+                        : discussions.map(d => `
+                            <div class="discussion-item">
+                                <div class="discussion-meta">
+                                    <span class="discussion-author">${d.author}</span>
+                                    <span class="discussion-date">${d.date}</span>
+                                </div>
+                                <div class="discussion-text">${d.comment}</div>
+                            </div>
+                        `).join('')}
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn-nav" onclick="AppState.setPage('browser')">← Back to Activities</button>
+                <button class="btn-nav" onclick="AppState.setPage('books')">📚 Back to Books</button>
+            </div>
+        `;
+    },
+    
+    async complete() {
+        const btn = document.querySelector('.btn-complete');
+        if (!btn) return;
+        
+        btn.disabled = true;
+        btn.textContent = 'Completing...';
+        
+        try {
+            await window.curriculumAPI.completeActivity(AppState.currentActivity.id, AppState.currentBook);
+            Utils.showToast('Activity completed! 🎉');
+            
+            // Reload to show completed state
+            await this.load(window.curriculumAPI, AppState.currentActivity);
+        } catch (error) {
+            alert('Failed to complete activity. Please try again.');
+            btn.disabled = false;
+            btn.textContent = '✓ Complete and Continue';
+        }
+    },
+    
+    async addComment() {
+        const textarea = document.getElementById('new-comment');
+        const comment = textarea?.value?.trim();
+        if (!comment) return;
+        
+        const btn = document.querySelector('.btn-post-comment');
+        btn.disabled = true;
+        btn.textContent = 'Posting...';
+        
+        try {
+            await window.curriculumAPI.addDiscussion(AppState.currentActivity.id, comment);
+            Utils.showToast('Comment posted!');
+            
+            // Reload discussions
+            await this.load(window.curriculumAPI, AppState.currentActivity);
+        } catch (error) {
+            alert('Failed to post comment. Please try again.');
+            btn.disabled = false;
+            btn.textContent = 'Post Comment';
+        }
+    }
+};
+
+// ===== INITIALIZATION =====
+window.initializeCurriculumSPA = async function() {
+    console.log('[Curriculum SPA v2] Initializing...');
+    
+    const config = window.CURRICULUM_RESOURCES_CONFIG;
+    if (!config) {
+        console.error('[Curriculum SPA] No config found');
+        return;
+    }
+    
+    console.log('[Curriculum SPA] Config loaded');
+    
+    // Wait for view to exist
+    const waitForView = setInterval(() => {
+        const view = document.querySelector('#' + config.viewKey);
+        if (view) {
+            clearInterval(waitForView);
+            initApp();
+        }
+    }, 100);
+    
+    async function initApp() {
+        console.log('[Curriculum SPA] View found, creating SPA container');
+        
+        const view = document.querySelector('#' + config.viewKey);
+        let container = document.getElementById('curriculum-spa-container');
+        
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'curriculum-spa-container';
+            view.parentElement.appendChild(container);
+        }
+        
+        container.innerHTML = `
+            <div class="curriculum-page active" data-page="books" id="page-books"></div>
+            <div class="curriculum-page" data-page="browser" id="page-browser"></div>
+            <div class="curriculum-page" data-page="viewer" id="page-viewer"></div>
+        `;
+        
+        // Initialize API with proper credentials
+        window.curriculumAPI = new CurriculumAPI({
+            knackAppId: config.knackAppId,
+            knackApiKey: config.knackApiKey
+        });
+        
+        console.log('[Curriculum SPA] API initialized');
+        
+        // Load Page 1
+        await Page1.render(window.curriculumAPI);
+        
+        console.log('[Curriculum SPA] 🎉 Ready! All 3 pages loaded in ONE scene!');
+    }
+};
+
+// Expose Page2 and Page3 globally for onclick handlers
+window.Page2 = Page2;
+window.Page3 = Page3;
+window.AppState = AppState;
+
+console.log('[Curriculum SPA v2] ✅ All components loaded - Ready to initialize!');
+

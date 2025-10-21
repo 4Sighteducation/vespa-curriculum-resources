@@ -1,0 +1,229 @@
+{
+    "metadata": {
+      "version": "1.1",
+      "lastUpdated": "2025-01-30",
+      "description": "Maps student problems to recommended VESPA activities - Updated with real activities only"
+    },
+    "problemMappings": {
+      "Vision": [
+        {
+          "id": "svision_1",
+          "text": "I'm unsure about my future goals",
+          "recommendedActivities": ["21st Birthday", "Roadmap", "Personal Compass", "Perfect Day"],
+          "activityIds": ["5fcd3fa0a8369b001b9fa1cf", "5ffe00e19ff689001bcb12ce", "5ffdfd68226f20001b05eb8f", "5fcd49ed0e734a001db4166f"]
+        },
+        {
+          "id": "svision_2", 
+          "text": "I'm not feeling motivated for my studies",
+          "recommendedActivities": ["Motivation Diamond", "Five Roads", "Mission & Medal", "What's Stopping You"],
+          "activityIds": ["5ffdfc0d1e82a6001e41e96e", "5ffe01865c1cca001b161e42", "5ffe06d11e82a6001e41f3eb", "5ffdffb386917a001be0853a"]
+        },
+        {
+          "id": "svision_3",
+          "text": "I can't see how school connects to my future",
+          "recommendedActivities": ["Success Leaves Clues", "There and Back", "20 Questions", "SMART Goals"],
+          "activityIds": ["5ffc7453482dc4001cf6730d", "5ff36ee0f46ecd001bcafaa4", "5fcb62a903d876001c5e1fcf", "5fcd52daa8369b001b9fb551"]
+        },
+        {
+          "id": "svision_4",
+          "text": "I don't really know what success looks like for me",
+          "recommendedActivities": ["Perfect Day", "Fix your dashboard", "Getting Dreams Done", "Personal Compass"],
+          "activityIds": ["5fcd49ed0e734a001db4166f", "5fcd52390dcf37001c0cc901", "5fcd2a08a8369b001b9f8883", "5ffdfd68226f20001b05eb8f"]
+        },
+        {
+          "id": "svision_5",
+          "text": "I haven't thought about what I want to achieve this year",
+          "recommendedActivities": ["SMART Goals", "Roadmap", "Mental Contrasting", "21st Birthday"],
+          "activityIds": ["5fcd52daa8369b001b9fb551", "5ffe00e19ff689001bcb12ce", "5fcf4ac1e54816001f9c60ce", "5fcd3fa0a8369b001b9fa1cf"]
+        },
+        {
+          "id": "svision_6",
+          "text": "I find it hard to picture myself doing well",
+          "recommendedActivities": ["Fake It!", "Perfect Day", "Inner Story Telling", "Force Field"],
+          "activityIds": ["5fcd517ba74fa2001bd48dad", "5fcd49ed0e734a001db4166f", "5fd5217af9fddc001cf453e5", "5ff3841848789d001c52ed81"]
+        },
+        {
+          "id": "svision_7",
+          "text": "I rarely think about where I'm heading or why I'm here",
+          "recommendedActivities": ["Personal Compass", "Five Roads", "One to Ten", "20 Questions"],
+          "activityIds": ["5ffdfd68226f20001b05eb8f", "5ffe01865c1cca001b161e42", "5fd01084e2bca3001bbe0283", "5fcb62a903d876001c5e1fcf"]
+        }
+      ],
+      "Effort": [
+        {
+          "id": "seffort_1",
+          "text": "I struggle to complete my homework on time",
+          "recommendedActivities": ["Weekly Planner", "25min Sprints", "Priority Matrix", "Now vs Most"],
+          "activityIds": ["5ffe0b461e82a6001e41f77d", "5ffe05c11e82a6001e41f2c5", "5ffe0d2186917a001be091a6", "5ffe02d95d4ee5001c30f11d"]
+        },
+        {
+          "id": "seffort_2",
+          "text": "I find it hard to keep trying when things get difficult",
+          "recommendedActivities": ["Will vs Skill", "Effort Thermometer", "Looking under Rocks", "Kill Your Critic"],
+          "activityIds": ["5ffe108e5c1cca001b162b8c", "5ffe09d15d4ee5001c30f799", "5ffe07ef1e82a6001e41f4cf", "5ffdfaed86917a001be07f6f"]
+        },
+        {
+          "id": "seffort_3",
+          "text": "I often give up if I don't get things right straight away",
+          "recommendedActivities": ["Failing Forwards", "Growth Mindset", "2 Slow, 1 Fast", "Learn from Mistakes"],
+          "activityIds": ["6005d84a236fdb001eb25437", "5ffe1476226f20001b060044", "5fed8f7f8ff75c001b6ebd5f", "5fecf758845cf7001bd26679"]
+        },
+        {
+          "id": "seffort_4",
+          "text": "I do the bare minimum just to get by",
+          "recommendedActivities": ["Effort Thermometer", "Mission & Medal", "Working Weeks", "The Bottom Left"],
+          "activityIds": ["5ffe09d15d4ee5001c30f799", "5ffe06d11e82a6001e41f3eb", "5fd626af3f7ed1001b80b269", "5ffe0dd186917a001be0923d"]
+        },
+        {
+          "id": "seffort_5",
+          "text": "I get distracted really easily when I try to study",
+          "recommendedActivities": ["High Flow Spaces", "Types of Attention", "Pre-Made Decisions", "Chunking Steps"],
+          "activityIds": ["5ffe11ac86917a001be095b6", "5ffe0eb05d4ee5001c30fbdb", "5ffe09425c1cca001b16253e", "5ffe0fa4aaec95001b10f70b"]
+        },
+        {
+          "id": "seffort_6",
+          "text": "I avoid topics or tasks that feel too hard",
+          "recommendedActivities": ["Will vs Skill", "Looking under Rocks", "2 Slow, 1 Fast", "The Lead Domino"],
+          "activityIds": ["5ffe108e5c1cca001b162b8c", "5ffe07ef1e82a6001e41f4cf", "5fed8f7f8ff75c001b6ebd5f", "5fe0ec9d45b5d5001bb535f8"]
+        },
+        {
+          "id": "seffort_7",
+          "text": "I put things off until I'm under pressure",
+          "recommendedActivities": ["10min Rule", "Frogs & Bannisters", "Now vs Most", "25min Sprints"],
+          "activityIds": ["5fd5197510f706001b0465d6", "5fd50afe5dbce5001b882d67", "5ffe02d95d4ee5001c30f11d", "5ffe05c11e82a6001e41f2c5"]
+        }
+      ],
+      "Systems": [
+        {
+          "id": "ssystems_1",
+          "text": "I'm not very organized with my notes and deadlines",
+          "recommendedActivities": ["Weekly Planner", "Priority Matrix", "STQR", "Graphic Organisers"],
+          "activityIds": ["5ffe0b461e82a6001e41f77d", "5ffe0d2186917a001be091a6", "5fe28f3c514b63001bb3a768", "5fec5dc532f5b1001bb756bf"]
+        },
+        {
+          "id": "ssystems_2",
+          "text": "I don't have a good revision plan",
+          "recommendedActivities": ["Leitner Box", "Revision Questionnaire", "Spaced Practice", "2-4-8 Rule"],
+          "activityIds": ["5fe8d54dc4627e001b8ccd12", "5fe8ca680c7c48001bd7db56", "5ffe101f226f20001b05fcd4", "5fe0dcf4590766001ba431cf"]
+        },
+        {
+          "id": "ssystems_3",
+          "text": "I keep forgetting what homework I have",
+          "recommendedActivities": ["Weekly Planner", "Rule of 3", "Project Progress Chart", "Packing Bags"],
+          "activityIds": ["5ffe0b461e82a6001e41f77d", "5ffe054a5d4ee5001c30f3a1", "5fe2940aafeba3001dcc5f77", "5ffe0876226f20001b05f671"]
+        },
+        {
+          "id": "ssystems_4",
+          "text": "I leave everything to the last minute",
+          "recommendedActivities": ["Eisenhower Matrix", "Priority Matrix", "The Lead Domino", "10min Rule"],
+          "activityIds": ["5fe38371c76bfd001b459923", "5ffe0d2186917a001be091a6", "5fe0ec9d45b5d5001bb535f8", "5fd5197510f706001b0465d6"]
+        },
+        {
+          "id": "ssystems_5",
+          "text": "I don't use a planner or calendar to track my work",
+          "recommendedActivities": ["Weekly Planner", "Project Progress Chart", "Working Weeks", "Rule of 3"],
+          "activityIds": ["5ffe0b461e82a6001e41f77d", "5fe2940aafeba3001dcc5f77", "5fd626af3f7ed1001b80b269", "5ffe054a5d4ee5001c30f3a1"]
+        },
+        {
+          "id": "ssystems_6",
+          "text": "My notes are all over the place and hard to follow",
+          "recommendedActivities": ["Graphic Organisers", "STQR", "Right-Wrong-Right", "Chunking Steps"],
+          "activityIds": ["5fec5dc532f5b1001bb756bf", "5fe28f3c514b63001bb3a768", "5feb62388fd0f4001b0e9d04", "5ffe0fa4aaec95001b10f70b"]
+        },
+        {
+          "id": "ssystems_7",
+          "text": "I struggle to prioritise what to do first",
+          "recommendedActivities": ["Priority Matrix", "Eisenhower Matrix", "The Lead Domino", "Now vs Most"],
+          "activityIds": ["5ffe0d2186917a001be091a6", "5fe38371c76bfd001b459923", "5fe0ec9d45b5d5001bb535f8", "5ffe02d95d4ee5001c30f11d"]
+        }
+      ],
+      "Practice": [
+        {
+          "id": "spractice_1",
+          "text": "I don't review my work regularly",
+          "recommendedActivities": ["Test Yourself", "Spaced Practice", "Leitner Box", "2-4-8 Rule"],
+          "activityIds": ["5ffe134d1e82a6001e41ffe7", "5ffe101f226f20001b05fcd4", "5fe8d54dc4627e001b8ccd12", "5fe0dcf4590766001ba431cf"]
+        },
+        {
+          "id": "spractice_2",
+          "text": "I tend to cram before tests",
+          "recommendedActivities": ["Revision Questionnaire", "Spaced Practice", "Snack Don't Binge", "2-4-8 Rule"],
+          "activityIds": ["5fe8ca680c7c48001bd7db56", "5ffe101f226f20001b05fcd4", "5fe08034a529d3001b2b5b29", "5fe0dcf4590766001ba431cf"]
+        },
+        {
+          "id": "spractice_3",
+          "text": "I avoid practising topics I find hard",
+          "recommendedActivities": ["Will vs Skill", "2 Slow, 1 Fast", "Looking under Rocks", "The Bottom Left"],
+          "activityIds": ["5ffe108e5c1cca001b162b8c", "5fed8f7f8ff75c001b6ebd5f", "5ffe07ef1e82a6001e41f4cf", "5ffe0dd186917a001be0923d"]
+        },
+        {
+          "id": "spractice_4",
+          "text": "I'm not sure how to revise effectively",
+          "recommendedActivities": ["Time to Teach", "9 Box Grid", "Practice Questionnaire", "Test Yourself"],
+          "activityIds": ["5ffe12c89ff689001bcb2281", "5ffe111a1e82a6001e41fe2b", "5ffe0fa4aaec95001b10f70b", "5ffe134d1e82a6001e41ffe7"]
+        },
+        {
+          "id": "spractice_5",
+          "text": "I don't practise exam-style questions enough",
+          "recommendedActivities": ["Test Yourself", "Know the Skills", "Mechanical vs Flexible", "Right-Wrong-Right"],
+          "activityIds": ["5ffe134d1e82a6001e41ffe7", "5fedaf2e19a8b7001c29cace", "5fedc39cf3be06001b6ddbe3", "5feb62388fd0f4001b0e9d04"]
+        },
+        {
+          "id": "spractice_6",
+          "text": "I don't really learn from the mistakes I make",
+          "recommendedActivities": ["Failing Forwards", "Learn from Mistakes", "Right-Wrong-Right", "Problem Solving"],
+          "activityIds": ["6005d84a236fdb001eb25437", "5fecf758845cf7001bd26679", "5feb62388fd0f4001b0e9d04", "5ffe13feaaec95001b10fa95"]
+        },
+        {
+          "id": "spractice_7",
+          "text": "I rarely check my understanding before moving on",
+          "recommendedActivities": ["Test Yourself", "Independent Learning", "9 Box Grid", "Time to Teach"],
+          "activityIds": ["5ffe134d1e82a6001e41ffe7", "5ffe12545d4ee5001c30fefa", "5ffe111a1e82a6001e41fe2b", "5ffe12c89ff689001bcb2281"]
+        }
+      ],
+      "Attitude": [
+        {
+          "id": "sattitude_1",
+          "text": "I worry I'm not smart enough",
+          "recommendedActivities": ["Growth Mindset", "The Battery", "Managing Reactions", "Stopping Negative Thoughts"],
+          "activityIds": ["5ffe1476226f20001b060044", "5ffe15ccf6034a001b98b749", "5ffe1700f6034a001b98b834", "6005f0b6041501001c676cb8"]
+        },
+        {
+          "id": "sattitude_2",
+          "text": "I get easily discouraged by setbacks",
+          "recommendedActivities": ["Failing Forwards", "Benefit Finding", "Change Curve", "The First Aid Kit"],
+          "activityIds": ["6005d84a236fdb001eb25437", "5ffe169f656c5e001c712382", "5fef592f648880001c1b7296", "5ffe16205c1cca001b162fe2"]
+        },
+        {
+          "id": "sattitude_3",
+          "text": "I often compare myself to others and feel behind",
+          "recommendedActivities": ["The Battery", "Network Audits", "Vampire Test", "One to Ten"],
+          "activityIds": ["5ffe15ccf6034a001b98b749", "5ffe15505c1cca001b162f4b", "5ff1f0b28a0c35001c57fb89", "5fd01084e2bca3001bbe0283"]
+        },
+        {
+          "id": "sattitude_4",
+          "text": "I don't believe my effort really makes a difference",
+          "recommendedActivities": ["Growth Mindset", "Effort Thermometer", "Force Field", "Will vs Skill"],
+          "activityIds": ["5ffe1476226f20001b060044", "5ffe09d15d4ee5001c30f799", "5ff3841848789d001c52ed81", "5ffe108e5c1cca001b162b8c"]
+        },
+        {
+          "id": "sattitude_5",
+          "text": "I feel overwhelmed when I don't get something straight away",
+          "recommendedActivities": ["The First Aid Kit", "Stand Tall", "Managing Reactions", "Power of If"],
+          "activityIds": ["5ffe16205c1cca001b162fe2", "6005de7c1e85bf001c4c451e", "5ffe1700f6034a001b98b834", "5fd52773ccb3a3002350961d"]
+        },
+        {
+          "id": "sattitude_6",
+          "text": "I tell myself I'm just not good at certain subjects",
+          "recommendedActivities": ["Growth Mindset", "Stopping Negative Thoughts", "Kill Your Critic", "Fake It!"],
+          "activityIds": ["5ffe1476226f20001b060044", "6005f0b6041501001c676cb8", "5ffdfaed86917a001be07f6f", "5fcd517ba74fa2001bd48dad"]
+        },
+        {
+          "id": "sattitude_7",
+          "text": "I find it hard to stay positive about school",
+          "recommendedActivities": ["Network Audits", "The Battery", "Vampire Test", "Benefit Finding"],
+          "activityIds": ["5ffe15505c1cca001b162f4b", "5ffe15ccf6034a001b98b749", "5ff1f0b28a0c35001c57fb89", "5ffe169f656c5e001c712382"]
+        }
+      ]
+    }
+  } 
