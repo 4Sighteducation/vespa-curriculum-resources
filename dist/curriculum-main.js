@@ -680,15 +680,31 @@ window.CurriculumShared = CurriculumShared;
         }, 300);
     }
     
-    $(document).on(`knack-scene-render.${SCENE_ID.replace('scene_', '')}`, init);
-    $(document).on(`knack-view-render.${VIEW_ID.replace('view_', '')}`, init);
+    // MULTIPLE TRIGGER POINTS to ensure it loads
+    $(document).on(`knack-scene-render.${SCENE_ID.replace('scene_', '')}`, function() {
+        log('Scene render event triggered');
+        init();
+    });
     
+    $(document).on(`knack-view-render.${VIEW_ID.replace('view_', '')}`, function() {
+        log('View render event triggered');
+        init();
+    });
+    
+    // Also trigger on general header init completion
+    $(document).on('general-header-ready', function() {
+        log('General header ready event triggered');
+        setTimeout(init, 200);
+    });
+    
+    // Immediate check if we're already on the scene
     if (window.location.hash.includes('tutor-activities') || 
         window.location.hash.includes(SCENE_ID.replace('scene_', ''))) {
-        setTimeout(init, 500);
+        log('Already on scene, triggering init immediately');
+        setTimeout(init, 800); // Increased delay to let GeneralHeader finish
     }
     
-    log('Page 1 Enhancer loaded');
+    log('Page 1 Enhancer loaded with multiple triggers');
 })();
 
 // ===== INITIALIZE CURRICULUM RESOURCES =====
@@ -704,27 +720,28 @@ window.initializeCurriculumResources = function() {
     console.log('[Curriculum Resources] Config loaded:', config);
     console.log('[Curriculum Resources] Ready for use on scene:', config.sceneKey);
     
-    // TRIGGER PAGE 1 IMMEDIATELY since we're already on the scene
-    console.log('[Curriculum Resources] Triggering Page 1 initialization...');
+    // TRIGGER PAGE 1 - Wait for GeneralHeader to finish first
+    console.log('[Curriculum Resources] Waiting for GeneralHeader to complete...');
     
-    // Wait a moment for DOM to be ready
-    setTimeout(() => {
-        const viewContainer = document.querySelector(`#${config.viewKey}`) || 
-                            document.querySelector('.kn-scene') ||
-                            document.querySelector(`#kn-${config.sceneKey}`);
+    // Function to check if GeneralHeader is done
+    function waitForHeaderThenInit() {
+        const header = document.getElementById('vespaGeneralHeader');
         
-        if (viewContainer) {
-            console.log('[Curriculum Resources] View container found, triggering render');
-            // Manually trigger the scene render to init Page 1
-            $(document).trigger(`knack-scene-render.${config.sceneKey.replace('scene_', '')}`, { key: config.sceneKey });
+        if (header) {
+            console.log('[Curriculum Resources] GeneralHeader found, waiting a bit more for stability');
+            // Header exists, wait a moment for it to fully settle
+            setTimeout(() => {
+                console.log('[Curriculum Resources] Triggering Page 1 initialization...');
+                $(document).trigger(`knack-scene-render.${config.sceneKey.replace('scene_', '')}`, { key: config.sceneKey });
+            }, 500);
         } else {
-            console.error('[Curriculum Resources] View container not found. Looking for:', config.viewKey);
-            console.log('[Curriculum Resources] Available elements:', {
-                byViewId: !!document.querySelector(`#${config.viewKey}`),
-                bySceneClass: !!document.querySelector('.kn-scene'),
-                bySceneId: !!document.querySelector(`#kn-${config.sceneKey}`)
-            });
+            // Header not yet ready, check again
+            console.log('[Curriculum Resources] GeneralHeader not ready yet, checking again...');
+            setTimeout(waitForHeaderThenInit, 200);
         }
-    }, 500);
+    }
+    
+    // Start the wait sequence
+    setTimeout(waitForHeaderThenInit, 300);
 };
 
