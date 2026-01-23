@@ -292,6 +292,11 @@ const getGoogleTranslateLanguage = () => {
             if (value.includes('/cy')) return 'cy';
             if (value.includes('/en')) return 'en';
         }
+        const selector = document.querySelector('.goog-te-combo');
+        if (selector && selector.value) {
+            if (selector.value === 'cy') return 'cy';
+            if (selector.value === 'en') return 'en';
+        }
         const htmlLang = document.documentElement?.lang || '';
         if (htmlLang.toLowerCase().startsWith('cy')) return 'cy';
         if (htmlLang.toLowerCase().startsWith('en')) return 'en';
