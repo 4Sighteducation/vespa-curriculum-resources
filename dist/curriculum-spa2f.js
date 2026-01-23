@@ -284,11 +284,29 @@ const loadWelshOverrides = async () => {
     }
 };
 
+const getGoogleTranslateLanguage = () => {
+    try {
+        const cookieMatch = document.cookie.match(/(?:^|; )googtrans=([^;]+)/);
+        if (cookieMatch) {
+            const value = decodeURIComponent(cookieMatch[1]);
+            if (value.includes('/cy')) return 'cy';
+            if (value.includes('/en')) return 'en';
+        }
+        const htmlLang = document.documentElement?.lang || '';
+        if (htmlLang.toLowerCase().startsWith('cy')) return 'cy';
+        if (htmlLang.toLowerCase().startsWith('en')) return 'en';
+    } catch (_) {}
+    return '';
+};
+
 const getCurrentLanguage = () => {
     if (typeof window !== 'undefined' && window.Weglot && typeof window.Weglot.getCurrentLang === 'function') {
         return window.Weglot.getCurrentLang() || 'en';
     }
-    return localStorage.getItem('vespaPreferredLanguage') || 'en';
+    const stored = localStorage.getItem('vespaPreferredLanguage');
+    if (stored) return stored;
+    const gtLang = getGoogleTranslateLanguage();
+    return gtLang || 'en';
 };
 
 const getWelshOverride = (activity) => {
