@@ -919,6 +919,28 @@ window.initializeCurriculumSPA = async function() {
         }
     }, 100);
     
+    let lastLanguage = null;
+
+    const refreshForLanguage = (lang) => {
+        if (!lang || lang === lastLanguage) return;
+        lastLanguage = lang;
+        try {
+            if (State.page === 'viewer' && State.activity?.id) {
+                P3.show(window.api, State.activity.id);
+                return;
+            }
+            if (State.page === 'browser') {
+                P2.render(window.api);
+                return;
+            }
+            if (State.page === 'books') {
+                P1.show(window.api);
+            }
+        } catch (e) {
+            console.warn('[SPA v2f] Language refresh failed:', e);
+        }
+    };
+
     async function init() {
         const view = document.querySelector('#' + config.viewKey);
         let container = document.getElementById('curriculum-spa-container');
@@ -941,6 +963,8 @@ window.initializeCurriculumSPA = async function() {
         });
 
         await loadWelshOverrides();
+        lastLanguage = getCurrentLanguage();
+        setInterval(() => refreshForLanguage(getCurrentLanguage()), 800);
         P1.show(window.api);
         
         console.log('[SPA v2f] ✅ Ready! Fixed completion saving + problem search!');
