@@ -11,6 +11,8 @@
 window.CURRICULUM_RESOURCES_CONFIG = {
     knackAppId: '5ee90912c38ae7001510c1a9',
     knackApiKey: '8f733aa5-dd35-4464-8348-64824d1f5f0d',
+    supabaseUrl: 'https://qcdcdzfanrlvdcagmwmg.supabase.co',
+    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZGNkemZhbnJsdmRjYWdtd21nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MDc4MjYsImV4cCI6MjA2OTQ4MzgyNn0.ahntO4OGSBfR2vnP_gMxfaRggP4eD5mejzq5sZegmME',
     sceneKey: 'scene_1280',
     viewKey: 'view_3244',
     appType: 'curriculumResources',

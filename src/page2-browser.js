@@ -132,10 +132,7 @@
                     this.error = null;
                     
                     try {
-                        const api = new window.CurriculumAPI({
-                            knackAppId: CONFIG.knackAppId,
-                            knackApiKey: CONFIG.knackApiKey
-                        });
+                        const api = new window.CurriculumAPI(CONFIG);
                         
                         // Fetch activities for this book
                         const [activities, completions] = await Promise.all([

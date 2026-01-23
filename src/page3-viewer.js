@@ -84,10 +84,7 @@
                     this.error = null;
                     
                     try {
-                        const api = new window.CurriculumAPI({
-                            knackAppId: CONFIG.knackAppId,
-                            knackApiKey: CONFIG.knackApiKey
-                        });
+                        const api = new window.CurriculumAPI(CONFIG);
                         
                         // Fetch activity details
                         const allActivities = await api.getActivities();
@@ -126,10 +123,7 @@
                     this.completing = true;
                     
                     try {
-                        const api = new window.CurriculumAPI({
-                            knackAppId: CONFIG.knackAppId,
-                            knackApiKey: CONFIG.knackApiKey
-                        });
+                        const api = new window.CurriculumAPI(CONFIG);
                         
                         await api.completeActivity(this.activityId, this.bookName);
                         
@@ -152,10 +146,7 @@
                     this.addingComment = true;
                     
                     try {
-                        const api = new window.CurriculumAPI({
-                            knackAppId: CONFIG.knackAppId,
-                            knackApiKey: CONFIG.knackApiKey
-                        });
+                        const api = new window.CurriculumAPI(CONFIG);
                         
                         await api.addDiscussion(this.activityId, this.newComment);
                         

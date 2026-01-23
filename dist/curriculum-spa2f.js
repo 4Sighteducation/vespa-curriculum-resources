@@ -8,6 +8,10 @@ console.log('[Curriculum SPA v2f] Loading...');
 class CurriculumAPI {
     constructor(config) {
         this.config = config;
+        this.supabase = {
+            url: config.supabaseUrl || window.VESPA_SUPABASE_URL || '',
+            key: config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || ''
+        };
         this.allActivitiesCache = null;
         this.problemMappingsCache = null; // Cache for problem mappings
     }
@@ -32,9 +36,57 @@ class CurriculumAPI {
             return {};
         }
     }
+
+    hasSupabase() {
+        return Boolean(this.supabase.url && this.supabase.key);
+    }
+
+    async fetchFromSupabase(path, params = {}) {
+        if (!this.hasSupabase()) throw new Error('Supabase config missing');
+        const url = new URL(`${this.supabase.url}/rest/v1/${path}`);
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                url.searchParams.set(key, value);
+            }
+        });
+        const response = await fetch(url.toString(), {
+            headers: {
+                apikey: this.supabase.key,
+                Authorization: `Bearer ${this.supabase.key}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
+        return response.json();
+    }
+
+    buildSupabaseActivity(record) {
+        const book = record.content?.book || '';
+        const month = record.content?.month || '';
+        const theme = record.content?.theme || record.vespa_category || 'General';
+        const activityId = record.content?.activity_code || record.knack_id || record.id;
+        const embedHtml = [
+            record.content?.pdf_embed,
+            record.content?.pdf_download_html,
+            record.think_section_html
+        ]
+            .filter(Boolean)
+            .join('\n');
+
+        return {
+            id: record.id,
+            book: book,
+            activityId: activityId,
+            theme: theme,
+            name: record.name,
+            group: month && book ? `${month} - ${book}` : null,
+            content: embedHtml
+        };
+    }
     
     // Get ALL activities (all books) for problem search
     async getAllActivities() {
+        if (this.hasSupabase()) return this.getAllActivitiesFromSupabase();
         if (this.allActivitiesCache) return this.allActivitiesCache;
         
         const filters = {
@@ -55,6 +107,16 @@ class CurriculumAPI {
             content: r.field_1448_raw || r.field_1448
         }));
         
+        return this.allActivitiesCache;
+    }
+
+    async getAllActivitiesFromSupabase() {
+        if (this.allActivitiesCache) return this.allActivitiesCache;
+        const records = await this.fetchFromSupabase('activities', {
+            select: 'id,name,vespa_category,knack_id,content,think_section_html',
+            'content->>resource_type': 'eq.worksheet'
+        });
+        this.allActivitiesCache = records.map(r => this.buildSupabaseActivity(r));
         return this.allActivitiesCache;
     }
 
@@ -94,6 +156,7 @@ class CurriculumAPI {
     }
 
     async getActivities(bookName) {
+        if (this.hasSupabase()) return this.getActivitiesFromSupabase(bookName);
         const filters = {
             match: 'and',
             rules: [
@@ -114,6 +177,18 @@ class CurriculumAPI {
             group: r.field_1435_raw || r.field_1435,
             content: r.field_1448_raw || r.field_1448
         }));
+    }
+
+    async getActivitiesFromSupabase(bookName) {
+        const params = {
+            select: 'id,name,vespa_category,knack_id,content,think_section_html',
+            'content->>resource_type': 'eq.worksheet'
+        };
+        if (bookName) {
+            params['content->>book'] = `eq.${bookName}`;
+        }
+        const records = await this.fetchFromSupabase('activities', params);
+        return records.map(r => this.buildSupabaseActivity(r));
     }
 
     async getUserCompletions() {
@@ -987,10 +1062,7 @@ window.initializeCurriculumSPA = async function() {
             <div class="curriculum-page" data-page="viewer" id="page-viewer"></div>
         `;
         
-        window.api = new CurriculumAPI({
-            knackAppId: config.knackAppId,
-            knackApiKey: config.knackApiKey
-        });
+        window.api = new CurriculumAPI(config);
 
         await loadWelshOverrides();
         lastLanguage = getCurrentLanguage();

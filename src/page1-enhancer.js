@@ -34,10 +34,7 @@
         }
         
         if (!api) {
-            api = new window.CurriculumAPI({
-                knackAppId: CONFIG.knackAppId,
-                knackApiKey: CONFIG.knackApiKey
-            });
+            api = new window.CurriculumAPI(CONFIG);
         }
         
         return api;

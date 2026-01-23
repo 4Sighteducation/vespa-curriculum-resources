@@ -1,11 +1,15 @@
 /**
- * VESPA Curriculum Resources - Knack API Integration
+ * VESPA Curriculum Resources - Data Integration
  * Handles all data fetching and caching for curriculum resources
  */
 
 class CurriculumAPI {
     constructor(config) {
         this.config = config;
+        this.supabase = {
+            url: config.supabaseUrl || window.VESPA_SUPABASE_URL || '',
+            key: config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || ''
+        };
         this.cache = {
             books: null,
             groups: null,
@@ -16,6 +20,43 @@ class CurriculumAPI {
         };
         this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
     }
+    /**
+     * Check if Supabase config is available
+     */
+    hasSupabase() {
+        return Boolean(this.supabase.url && this.supabase.key);
+    }
+
+    /**
+     * Fetch data from Supabase REST API
+     */
+    async fetchFromSupabase(path, params = {}) {
+        if (!this.hasSupabase()) {
+            throw new Error('Supabase config missing');
+        }
+
+        const url = new URL(`${this.supabase.url}/rest/v1/${path}`);
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                url.searchParams.set(key, value);
+            }
+        });
+
+        const response = await fetch(url.toString(), {
+            headers: {
+                apikey: this.supabase.key,
+                Authorization: `Bearer ${this.supabase.key}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Supabase API error: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
 
     /**
      * Get current logged-in user info
@@ -85,6 +126,10 @@ class CurriculumAPI {
      * Get all books (Object_56)
      */
     async getBooks() {
+        if (this.hasSupabase()) {
+            return this.getBooksFromSupabase();
+        }
+
         if (this.isCacheValid('books')) {
             return this.cache.books;
         }
@@ -109,6 +154,10 @@ class CurriculumAPI {
      * Get activity groups (Object_57) - Monthly curriculum
      */
     async getActivityGroups(bookName = null) {
+        if (this.hasSupabase()) {
+            return this.getGroupsFromSupabase(bookName);
+        }
+
         if (this.isCacheValid('groups') && !bookName) {
             return this.cache.groups;
         }
@@ -156,6 +205,10 @@ class CurriculumAPI {
      * Get all activities (Object_58)
      */
     async getActivities(bookName = null, groupName = null) {
+        if (this.hasSupabase()) {
+            return this.getActivitiesFromSupabase(bookName, groupName);
+        }
+
         if (this.isCacheValid('activities') && !bookName && !groupName) {
             return this.cache.activities;
         }
@@ -508,6 +561,157 @@ class CurriculumAPI {
             discussions: null,
             lastFetch: {}
         };
+    }
+
+    /**
+     * Supabase: Get books derived from activities
+     */
+    async getBooksFromSupabase() {
+        if (this.isCacheValid('books')) {
+            return this.cache.books;
+        }
+
+        try {
+            const records = await this.fetchFromSupabase('activities', {
+                select: 'content',
+                'content->>resource_type': 'eq.worksheet'
+            });
+
+            const booksMap = new Map();
+            records.forEach((record) => {
+                const book = record.content?.book;
+                if (book && !booksMap.has(book)) {
+                    booksMap.set(book, {
+                        id: book,
+                        name: book,
+                        imageUrl: record.content?.book_image_url || '',
+                        imageHtml: ''
+                    });
+                }
+            });
+
+            const books = Array.from(booksMap.values());
+            this.cache.books = books;
+            this.cache.lastFetch.books = Date.now();
+            return books;
+        } catch (error) {
+            console.error('[Curriculum API] Failed to fetch books from Supabase:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Supabase: Get activity groups derived from activities
+     */
+    async getGroupsFromSupabase(bookName = null) {
+        if (this.isCacheValid('groups') && !bookName) {
+            return this.cache.groups;
+        }
+
+        try {
+            const params = {
+                select: 'content',
+                'content->>resource_type': 'eq.worksheet'
+            };
+            if (bookName) {
+                params['content->>book'] = `eq.${bookName}`;
+            }
+
+            const records = await this.fetchFromSupabase('activities', params);
+            const groupsMap = new Map();
+
+            records.forEach((record) => {
+                const book = record.content?.book || '';
+                const month = record.content?.month || 'Other';
+                const key = `${month} - ${book}`;
+                if (!groupsMap.has(key)) {
+                    groupsMap.set(key, {
+                        id: key,
+                        month: month,
+                        bookName: book,
+                        summary: '',
+                        dateAdded: '',
+                        monthLevel: ''
+                    });
+                }
+            });
+
+            const groups = Array.from(groupsMap.values());
+            if (!bookName) {
+                this.cache.groups = groups;
+                this.cache.lastFetch.groups = Date.now();
+            }
+            return groups;
+        } catch (error) {
+            console.error('[Curriculum API] Failed to fetch groups from Supabase:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Supabase: Get activities from unified activities table
+     */
+    async getActivitiesFromSupabase(bookName = null, groupName = null) {
+        if (this.isCacheValid('activities') && !bookName && !groupName) {
+            return this.cache.activities;
+        }
+
+        try {
+            const params = {
+                select: 'id,name,vespa_category,level,knack_id,content,think_section_html,created_at',
+                'content->>resource_type': 'eq.worksheet'
+            };
+
+            if (bookName) {
+                params['content->>book'] = `eq.${bookName}`;
+            }
+
+            if (groupName) {
+                const month = groupName.split(' - ')[0];
+                if (month) {
+                    params['content->>month'] = `eq.${month}`;
+                }
+            }
+
+            const records = await this.fetchFromSupabase('activities', params);
+
+            const activities = records.map((record) => {
+                const book = record.content?.book || '';
+                const month = record.content?.month || '';
+                const theme = record.content?.theme || record.vespa_category;
+                const activityId = record.content?.activity_code || record.knack_id || record.id;
+                const embedHtml = [
+                    record.content?.pdf_embed,
+                    record.content?.pdf_download_html,
+                    record.think_section_html
+                ]
+                    .filter(Boolean)
+                    .join('\n');
+
+                return {
+                    id: record.id,
+                    book: book,
+                    activityId: activityId,
+                    theme: theme,
+                    name: record.name,
+                    group: month && book ? `${month} - ${book}` : null,
+                    dateAdded: record.created_at,
+                    content: embedHtml,
+                    isWelsh: Boolean(record.content?.is_welsh),
+                    otherLanguage: record.content?.other_language || ''
+                };
+            });
+
+            if (!bookName && !groupName) {
+                this.cache.activities = activities;
+                this.cache.lastFetch.activities = Date.now();
+            }
+
+            return activities;
+        } catch (error) {
+            console.error('[Curriculum API] Failed to fetch activities from Supabase:', error);
+            return [];
+        }
     }
 }
 
