@@ -248,7 +248,7 @@ const loadWelshOverrides = async () => {
         return welshOverrideCache;
     }
     const baseUrl = url.replace(/\/$/, '');
-    const endpoint = `${baseUrl}/rest/v1/activities?select=name,book,name_cy,slides_url_cy,slides_embed_cy&or=(name_cy.not.is.null,slides_url_cy.not.is.null,slides_embed_cy.not.is.null)`;
+    const endpoint = `${baseUrl}/rest/v1/activities?select=name,book,knack_activity_id,name_cy,slides_url_cy,slides_embed_cy&or=(name_cy.not.is.null,slides_url_cy.not.is.null,slides_embed_cy.not.is.null)`;
     try {
         const response = await fetch(endpoint, {
             headers: {
@@ -262,12 +262,18 @@ const loadWelshOverrides = async () => {
         data.forEach(item => {
             const nameKey = String(item.name || '').toLowerCase();
             const bookKey = String(item.book || '').toLowerCase();
-            if (!nameKey) return;
-            map[`${nameKey}|${bookKey}`] = {
+            const activityKey = String(item.knack_activity_id || '').toLowerCase();
+            const payload = {
                 name_cy: item.name_cy || null,
                 slides_url_cy: item.slides_url_cy || null,
                 slides_embed_cy: item.slides_embed_cy || null
             };
+            if (nameKey) {
+                map[`${nameKey}|${bookKey}`] = payload;
+            }
+            if (activityKey) {
+                map[`id:${activityKey}`] = payload;
+            }
         });
         welshOverrideCache = map;
         return map;
@@ -287,8 +293,10 @@ const getCurrentLanguage = () => {
 
 const getWelshOverride = (activity) => {
     const map = welshOverrideCache || {};
+    const activityKey = String(activity?.activityId || '').toLowerCase();
     const nameKey = String(activity?.name || '').toLowerCase();
     const bookKey = String(activity?.book || '').toLowerCase();
+    if (activityKey && map[`id:${activityKey}`]) return map[`id:${activityKey}`];
     if (!nameKey) return null;
     return map[`${nameKey}|${bookKey}`] || map[`${nameKey}|`] || null;
 };
