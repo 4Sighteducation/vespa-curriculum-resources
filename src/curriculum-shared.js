@@ -68,7 +68,7 @@ const CurriculumShared = {
     extractPdfLink(htmlContent) {
         if (!htmlContent) return null;
         
-        const match = htmlContent.match(/href="([^"]*\.pdf[^"]*)"/i);
+        const match = htmlContent.match(/(?:href|src|data)="([^"]*\.pdf[^"]*)"/i);
         return match ? match[1] : null;
     },
 

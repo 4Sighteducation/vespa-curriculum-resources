@@ -20,6 +20,32 @@ class CurriculumAPI {
         };
         this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
     }
+
+    /**
+     * Detect preferred language for Welsh filtering
+     */
+    getPreferredLanguage() {
+        try {
+            if (typeof window !== 'undefined' && window.Weglot && typeof window.Weglot.getCurrentLang === 'function') {
+                return window.Weglot.getCurrentLang() || 'en';
+            }
+            const stored = localStorage.getItem('vespaPreferredLanguage');
+            if (stored) return stored;
+            const cookieMatch = document.cookie.match(/(?:^|; )googtrans=([^;]+)/);
+            if (cookieMatch) {
+                const value = decodeURIComponent(cookieMatch[1]);
+                if (value.includes('/cy')) return 'cy';
+                if (value.includes('/en')) return 'en';
+            }
+        } catch (e) {
+            // Ignore language detection errors and fall back to English
+        }
+        return 'en';
+    }
+
+    isWelshActive() {
+        return this.getPreferredLanguage() === 'cy';
+    }
     /**
      * Check if Supabase config is available
      */
@@ -216,7 +242,7 @@ class CurriculumAPI {
         try {
             let filters = null;
             
-            if (bookName || groupName) {
+            if (bookName || groupName || !this.isWelshActive()) {
                 const rules = [];
                 if (bookName) {
                     rules.push({
@@ -230,6 +256,13 @@ class CurriculumAPI {
                         field: 'field_1435', // Tutor Activities Group connection
                         operator: 'contains',
                         value: groupName
+                    });
+                }
+                if (!this.isWelshActive()) {
+                    rules.push({
+                        field: 'field_1924', // Welsh flag
+                        operator: 'is',
+                        value: 'No'
                     });
                 }
                 filters = {
@@ -671,6 +704,9 @@ class CurriculumAPI {
                 if (month) {
                     params['content->>month'] = `eq.${month}`;
                 }
+            }
+            if (!this.isWelshActive()) {
+                params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
             }
 
             const records = await this.fetchFromSupabase('activities', params);

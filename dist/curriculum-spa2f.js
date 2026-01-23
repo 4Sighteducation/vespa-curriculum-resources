@@ -89,7 +89,8 @@ class CurriculumAPI {
         if (this.hasSupabase()) return this.getAllActivitiesFromSupabase();
         if (this.allActivitiesCache) return this.allActivitiesCache;
         
-        const filters = {
+        const isWelsh = getCurrentLanguage() === 'cy';
+        const filters = isWelsh ? null : {
             match: 'and',
             rules: [{ field: 'field_1924', operator: 'is', value: 'No' }] // Only non-Welsh
         };
@@ -112,10 +113,14 @@ class CurriculumAPI {
 
     async getAllActivitiesFromSupabase() {
         if (this.allActivitiesCache) return this.allActivitiesCache;
-        const records = await this.fetchFromSupabase('activities', {
+        const params = {
             select: 'id,name,vespa_category,knack_id,content,think_section_html',
             'content->>resource_type': 'eq.worksheet'
-        });
+        };
+        if (getCurrentLanguage() !== 'cy') {
+            params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
+        }
+        const records = await this.fetchFromSupabase('activities', params);
         this.allActivitiesCache = records.map(r => this.buildSupabaseActivity(r));
         return this.allActivitiesCache;
     }
@@ -160,10 +165,12 @@ class CurriculumAPI {
         const filters = {
             match: 'and',
             rules: [
-                { field: 'field_2702', operator: 'is', value: bookName },
-                { field: 'field_1924', operator: 'is', value: 'No' } // Filter out Welsh
+                { field: 'field_2702', operator: 'is', value: bookName }
             ]
         };
+        if (getCurrentLanguage() !== 'cy') {
+            filters.rules.push({ field: 'field_1924', operator: 'is', value: 'No' }); // Filter out Welsh
+        }
         
         const records = await this.fetch('object_58', filters);
         console.log('[API] Fetched', records.length, 'NON-Welsh activities');
@@ -186,6 +193,9 @@ class CurriculumAPI {
         };
         if (bookName) {
             params['content->>book'] = `eq.${bookName}`;
+        }
+        if (getCurrentLanguage() !== 'cy') {
+            params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
         }
         const records = await this.fetchFromSupabase('activities', params);
         return records.map(r => this.buildSupabaseActivity(r));
@@ -465,7 +475,7 @@ const U = {
     },
     pdf(html) {
         if (!html) return null;
-        const m = html.match(/href="([^"]*\.pdf[^"]*)"/i);
+        const m = html.match(/(?:href|src|data)="([^"]*\.pdf[^"]*)"/i);
         return m ? m[1] : null;
     },
     month(group) {
