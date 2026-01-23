@@ -250,6 +250,8 @@ const loadWelshOverrides = async () => {
     const baseUrl = url.replace(/\/$/, '');
     const endpoint = `${baseUrl}/rest/v1/activities?select=name,book,knack_id,knack_activity_id,name_cy,slides_url_cy,slides_embed_cy&or=(name_cy.not.is.null,slides_url_cy.not.is.null,slides_embed_cy.not.is.null)`;
     try {
+        const normalizeId = (value) => String(value || '').toLowerCase().replace(/[^0-9]/g, '');
+        const normalizeText = (value) => String(value || '').toLowerCase().trim();
         const response = await fetch(endpoint, {
             headers: {
                 apikey: key,
@@ -258,12 +260,13 @@ const loadWelshOverrides = async () => {
         });
         if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
         const data = await response.json();
+        console.log('[Curriculum SPA] Welsh overrides rows:', Array.isArray(data) ? data.length : 0);
         const map = {};
         data.forEach(item => {
-            const nameKey = String(item.name || '').toLowerCase();
-            const bookKey = String(item.book || '').toLowerCase();
-            const activityKey = String(item.knack_activity_id || '').toLowerCase();
-            const recordKey = String(item.knack_id || '').toLowerCase();
+            const nameKey = normalizeText(item.name);
+            const bookKey = normalizeText(item.book);
+            const activityKey = normalizeId(item.knack_activity_id);
+            const recordKey = normalizeText(item.knack_id);
             const payload = {
                 name_cy: item.name_cy || null,
                 slides_url_cy: item.slides_url_cy || null,
@@ -279,6 +282,7 @@ const loadWelshOverrides = async () => {
                 map[`knack:${recordKey}`] = payload;
             }
         });
+        console.log('[Curriculum SPA] Welsh override keys:', Object.keys(map).length);
         welshOverrideCache = map;
         return map;
     } catch (error) {
@@ -320,10 +324,12 @@ const getCurrentLanguage = () => {
 
 const getWelshOverride = (activity) => {
     const map = welshOverrideCache || {};
-    const activityKey = String(activity?.activityId || '').toLowerCase();
-    const recordKey = String(activity?.id || '').toLowerCase();
-    const nameKey = String(activity?.name || '').toLowerCase();
-    const bookKey = String(activity?.book || '').toLowerCase();
+    const normalizeId = (value) => String(value || '').toLowerCase().replace(/[^0-9]/g, '');
+    const normalizeText = (value) => String(value || '').toLowerCase().trim();
+    const activityKey = normalizeId(activity?.activityId);
+    const recordKey = normalizeText(activity?.id);
+    const nameKey = normalizeText(activity?.name);
+    const bookKey = normalizeText(activity?.book);
     if (activityKey && map[`id:${activityKey}`]) return map[`id:${activityKey}`];
     if (recordKey && map[`knack:${recordKey}`]) return map[`knack:${recordKey}`];
     if (!nameKey) return null;
