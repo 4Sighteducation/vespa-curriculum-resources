@@ -229,6 +229,88 @@ class CurriculumAPI {
     }
 }
 
+// ===== WELSH ACTIVITY OVERRIDES (Supabase) =====
+let welshOverrideCache = null;
+
+const getSupabaseConfig = () => {
+    const cfg = window.CURRICULUM_RESOURCES_CONFIG || {};
+    return {
+        url: cfg.supabaseUrl || window.VESPA_SUPABASE_URL || '',
+        key: cfg.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || ''
+    };
+};
+
+const loadWelshOverrides = async () => {
+    if (welshOverrideCache) return welshOverrideCache;
+    const { url, key } = getSupabaseConfig();
+    if (!url || !key) {
+        welshOverrideCache = {};
+        return welshOverrideCache;
+    }
+    const baseUrl = url.replace(/\/$/, '');
+    const endpoint = `${baseUrl}/rest/v1/activities?select=name,book,name_cy,slides_url_cy,slides_embed_cy&or=(name_cy.not.is.null,slides_url_cy.not.is.null,slides_embed_cy.not.is.null)`;
+    try {
+        const response = await fetch(endpoint, {
+            headers: {
+                apikey: key,
+                Authorization: `Bearer ${key}`
+            }
+        });
+        if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
+        const data = await response.json();
+        const map = {};
+        data.forEach(item => {
+            const nameKey = String(item.name || '').toLowerCase();
+            const bookKey = String(item.book || '').toLowerCase();
+            if (!nameKey) return;
+            map[`${nameKey}|${bookKey}`] = {
+                name_cy: item.name_cy || null,
+                slides_url_cy: item.slides_url_cy || null,
+                slides_embed_cy: item.slides_embed_cy || null
+            };
+        });
+        welshOverrideCache = map;
+        return map;
+    } catch (error) {
+        console.warn('[Curriculum SPA] Failed to load Welsh overrides from Supabase:', error);
+        welshOverrideCache = {};
+        return welshOverrideCache;
+    }
+};
+
+const getCurrentLanguage = () => {
+    if (typeof window !== 'undefined' && window.Weglot && typeof window.Weglot.getCurrentLang === 'function') {
+        return window.Weglot.getCurrentLang() || 'en';
+    }
+    return localStorage.getItem('vespaPreferredLanguage') || 'en';
+};
+
+const getWelshOverride = (activity) => {
+    const map = welshOverrideCache || {};
+    const nameKey = String(activity?.name || '').toLowerCase();
+    const bookKey = String(activity?.book || '').toLowerCase();
+    if (!nameKey) return null;
+    return map[`${nameKey}|${bookKey}`] || map[`${nameKey}|`] || null;
+};
+
+const getActivityDisplayName = (activity) => {
+    const baseName = activity?.name || '';
+    if (getCurrentLanguage() !== 'cy') return baseName;
+    if (activity?.name_cy) return activity.name_cy;
+    const override = getWelshOverride(activity);
+    return override?.name_cy || baseName;
+};
+
+const getActivityDisplayContent = (activity) => {
+    if (getCurrentLanguage() !== 'cy') return activity?.content || '';
+    const override = getWelshOverride(activity);
+    const pdf = U.pdf(activity?.content || '');
+    const embed = override?.slides_embed_cy
+        || (override?.slides_url_cy ? `<iframe src="${override.slides_url_cy}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>` : null);
+    if (embed) return pdf ? `${embed}<a href="${pdf}">PDF</a>` : embed;
+    return activity?.content || '';
+};
+
 // ===== UTILITIES =====
 const U = {
     colors: { Vision: '#FFA500', Effort: '#a4c2f4', Systems: '#aad950', Practice: '#a986ff', Attitude: '#ff769c' },
@@ -602,7 +684,7 @@ const P2 = {
         if (State.filters.search) {
             const q = State.filters.search.toLowerCase();
             filtered = filtered.filter(a => 
-                a.name.toLowerCase().includes(q) ||
+                getActivityDisplayName(a).toLowerCase().includes(q) ||
                 a.theme.toLowerCase().includes(q) ||
                 a.activityId.toString().includes(q)
             );
@@ -634,7 +716,7 @@ const P2 = {
             return `
                 <div class="activity-row ${isCompleted ? 'completed' : ''}" onclick="P3.show(window.api, '${a.id}')">
                     <div class="row-theme" style="background: ${U.getColor(a.theme)}">${a.theme}</div>
-                    <div class="row-name">${a.name}</div>
+                    <div class="row-name">${getActivityDisplayName(a)}</div>
                     <div class="row-month">${month}</div>
                     <div class="row-status">
                         ${isCompleted 
@@ -678,8 +760,10 @@ const P3 = {
     
     render(activity, discussions, isCompleted) {
         const c = document.getElementById('page-viewer');
-        const iframe = U.iframe(activity.content);
-        const pdf = U.pdf(activity.content);
+        const activityName = getActivityDisplayName(activity);
+        const activityContent = getActivityDisplayContent(activity);
+        const iframe = U.iframe(activityContent);
+        const pdf = U.pdf(activityContent);
         
         c.innerHTML = `
             <div class="viewer-container">
@@ -687,7 +771,7 @@ const P3 = {
                     <div class="breadcrumbs">
                         <a href="#" onclick="P1.show(window.api); return false;">📚 Books</a> › 
                         <a href="#" onclick="P2.show(window.api, '${State.book}'); return false;">${State.book}</a> › 
-                        <span>${activity.name}</span>
+                        <span>${activityName}</span>
                     </div>
                     
                     <div class="activity-header-info">
@@ -696,7 +780,7 @@ const P3 = {
                         ${isCompleted ? '<span class="badge badge-completed">✓ Completed</span>' : ''}
                     </div>
                     
-                    <h1 class="activity-title-large">${activity.name}</h1>
+                    <h1 class="activity-title-large">${activityName}</h1>
                 </div>
                 
                 <div class="viewer-main">
@@ -798,7 +882,7 @@ window.initializeCurriculumSPA = async function() {
         }
     }, 100);
     
-    function init() {
+    async function init() {
         const view = document.querySelector('#' + config.viewKey);
         let container = document.getElementById('curriculum-spa-container');
         
@@ -818,7 +902,8 @@ window.initializeCurriculumSPA = async function() {
             knackAppId: config.knackAppId,
             knackApiKey: config.knackApiKey
         });
-        
+
+        await loadWelshOverrides();
         P1.show(window.api);
         
         console.log('[SPA v2f] ✅ Ready! Fixed completion saving + problem search!');
