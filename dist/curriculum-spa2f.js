@@ -348,8 +348,26 @@ const getActivityDisplayContent = (activity) => {
     if (getCurrentLanguage() !== 'cy') return activity?.content || '';
     const override = getWelshOverride(activity);
     const pdf = U.pdf(activity?.content || '');
+    const buildEmbedUrl = (url) => {
+        if (!url) return '';
+        try {
+            const u = new URL(url);
+            if (!u.hostname.includes('slides.com')) return url;
+            if (u.pathname.endsWith('/fullscreen')) {
+                u.pathname = u.pathname.replace(/\/fullscreen$/, '/embed');
+            } else if (!u.pathname.endsWith('/embed')) {
+                u.pathname = `${u.pathname.replace(/\/$/, '')}/embed`;
+            }
+            if (!u.searchParams.has('byline')) u.searchParams.set('byline', 'hidden');
+            if (!u.searchParams.has('share')) u.searchParams.set('share', 'hidden');
+            return u.toString();
+        } catch (_) {
+            return url;
+        }
+    };
+    const embedUrl = override?.slides_url_cy ? buildEmbedUrl(override.slides_url_cy) : '';
     const embed = override?.slides_embed_cy
-        || (override?.slides_url_cy ? `<iframe src="${override.slides_url_cy}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>` : null);
+        || (embedUrl ? `<iframe src="${embedUrl}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>` : null);
     if (embed) return pdf ? `${embed}<a href="${pdf}">PDF</a>` : embed;
     return activity?.content || '';
 };
