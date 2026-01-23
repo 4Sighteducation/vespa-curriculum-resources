@@ -358,6 +358,12 @@ const getActivityDisplayContent = (activity) => {
             } else if (!u.pathname.endsWith('/embed')) {
                 u.pathname = `${u.pathname.replace(/\/$/, '')}/embed`;
             }
+            if (u.searchParams.has('token')) {
+                const rawToken = u.searchParams.get('token') || '';
+                const cleanToken = rawToken.split('?')[0].split('&')[0];
+                u.searchParams.set('token', cleanToken);
+            }
+            u.searchParams.delete('mouseWheel');
             if (!u.searchParams.has('byline')) u.searchParams.set('byline', 'hidden');
             if (!u.searchParams.has('share')) u.searchParams.set('share', 'hidden');
             return u.toString();
