@@ -1,0 +1,61 @@
+{
+  "source": "c:\\Users\\tonyd\\OneDrive - 4Sight Education Ltd\\Apps\\Resources\\tutoractivities_nested.json",
+  "total": 133,
+  "nullRows": 0,
+  "missing": {
+    "titleEn": 7,
+    "book": 7,
+    "month": 7,
+    "vespa_category": 7,
+    "activity_id": 7,
+    "record_id": 7
+  },
+  "inferredLevel": {
+    "level2": 41,
+    "level3": 40,
+    "both": 45,
+    "unknown": 7
+  },
+  "assets": {
+    "slidesEn": 126,
+    "slidesCy": 13,
+    "pdfEn": 45,
+    "pdfCy": 13,
+    "missingSlidesEn": 7,
+    "missingPdfEn": 88
+  },
+  "duplicateKeys": [
+    {
+      "key": "|||",
+      "firstIndex": 3,
+      "duplicateIndex": 127
+    },
+    {
+      "key": "|||",
+      "firstIndex": 3,
+      "duplicateIndex": 128
+    },
+    {
+      "key": "|||",
+      "firstIndex": 3,
+      "duplicateIndex": 129
+    },
+    {
+      "key": "|||",
+      "firstIndex": 3,
+      "duplicateIndex": 130
+    },
+    {
+      "key": "|||",
+      "firstIndex": 3,
+      "duplicateIndex": 131
+    },
+    {
+      "key": "|||",
+      "firstIndex": 3,
+      "duplicateIndex": 132
+    }
+  ],
+  "duplicateActivityIds": [],
+  "duplicateRecordIds": []
+}
