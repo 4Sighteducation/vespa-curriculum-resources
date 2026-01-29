@@ -159,7 +159,16 @@ class CurriculumAPI {
     
     // Get ALL activities (all books) for problem search
     async getAllActivities() {
-        if (this.hasSupabase()) return this.getAllActivitiesFromSupabase();
+        if (this.hasSupabase()) {
+            try {
+                return await this.getAllActivitiesFromSupabase();
+            } catch (e) {
+                // If Supabase isn't accessible (e.g. anon key invalid / RLS misconfigured), fall back to Knack.
+                console.warn('[Curriculum SPA] Supabase unavailable for activities; falling back to Knack.', e);
+                this.supabase.url = '';
+                this.supabase.key = '';
+            }
+        }
         if (this.allActivitiesCache) return this.allActivitiesCache;
         await this.loadTutorCanonicalOnce();
         
@@ -236,7 +245,16 @@ class CurriculumAPI {
     }
 
     async getActivities(bookName) {
-        if (this.hasSupabase()) return this.getActivitiesFromSupabase(bookName);
+        if (this.hasSupabase()) {
+            try {
+                return await this.getActivitiesFromSupabase(bookName);
+            } catch (e) {
+                // If Supabase isn't accessible (e.g. anon key invalid / RLS misconfigured), fall back to Knack.
+                console.warn('[Curriculum SPA] Supabase unavailable for activities; falling back to Knack.', e);
+                this.supabase.url = '';
+                this.supabase.key = '';
+            }
+        }
         await this.loadTutorCanonicalOnce();
         const filters = {
             match: 'and',
@@ -414,15 +432,17 @@ const getSupabaseConfig = () => {
     };
 };
 
-// ===== MODE BADGE (helps diagnose Supabase vs Knack) =====
-function renderDataSourceBadge(text) {
+// ===== MODE BADGE (debug-only; never show to end users) =====
+function renderDataSourceBadge(_text) {
+    // Intentionally disabled by default so users never see "Supabase OFF" (or any data-source messaging).
+    // If you ever want to re-enable locally, set:
+    //   localStorage.setItem('curriculumDebug', '1')
     try {
-        if (document.getElementById('vespa-curriculum-source-badge')) return;
-        const el = document.createElement('div');
-        el.id = 'vespa-curriculum-source-badge';
-        el.textContent = text;
-        el.style.cssText = 'position:fixed;bottom:10px;right:10px;z-index:999999;padding:8px 10px;border-radius:10px;background:rgba(15,23,42,0.88);color:#fff;font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial;box-shadow:0 6px 20px rgba(0,0,0,0.2);';
-        document.body.appendChild(el);
+        const enabled =
+            (typeof window !== 'undefined' && String(window.location?.href || '').includes('curriculumDebug=1')) ||
+            (typeof localStorage !== 'undefined' && localStorage.getItem('curriculumDebug') === '1');
+        if (!enabled) return;
+        // (Badge UI removed; console logging is the supported diagnostic path.)
     } catch (_) {}
 }
 
@@ -1126,11 +1146,11 @@ window.initializeCurriculumSPA = async function() {
     const config = window.CURRICULUM_RESOURCES_CONFIG;
     if (!config) return;
 
-    // Visible indicator of data source. If you see Knack mode here, Supabase URL/key are not configured on the page.
     try {
         const hasSb = Boolean((config.supabaseUrl || window.VESPA_SUPABASE_URL) && (config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY));
-        renderDataSourceBadge(hasSb ? 'Curriculum: Supabase mode' : 'Curriculum: Knack mode (Supabase OFF)');
-        if (!hasSb) {
+        if (hasSb) {
+            console.info('[Curriculum SPA] Supabase ON: using Supabase data source');
+        } else {
             console.warn('[Curriculum SPA] Supabase OFF: no supabaseUrl/supabaseAnonKey found. Using Knack + canonical overrides from tutoractivities_nested_from_csv.json');
         }
     } catch (_) {}
