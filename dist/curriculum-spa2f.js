@@ -41,6 +41,79 @@ class CurriculumAPI {
         return Boolean(this.supabase.url && this.supabase.key);
     }
 
+    // --- Canonical tutor resources overrides (used when Supabase is not configured) ---
+    async loadTutorCanonicalOnce() {
+        if (this._tutorCanonicalLoaded) return this._tutorCanonicalLoaded;
+        this._tutorCanonicalLoaded = (async () => {
+            const cacheBust = (typeof window !== 'undefined' && (window.__VESPA_LOADER_VERSION || window.__VESPA_CURRICULUM_VERSION))
+                ? String(window.__VESPA_LOADER_VERSION || window.__VESPA_CURRICULUM_VERSION)
+                : String(Date.now());
+            const url = `https://cdn.jsdelivr.net/gh/4Sighteducation/vespa-curriculum-resources@main/tutoractivities_nested_from_csv.json?v=${encodeURIComponent(cacheBust)}`;
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const json = await resp.json();
+                const byActivityId = {};
+                const byRecordId = {};
+                (Array.isArray(json) ? json : []).forEach((item) => {
+                    const aid = String(item?.activity_id || '').trim();
+                    const rid = String(item?.record_id || '').trim();
+                    if (aid) byActivityId[aid] = item;
+                    if (rid) byRecordId[rid] = item;
+                });
+                this._tutorCanonical = { byActivityId, byRecordId, url };
+                console.log('[Curriculum SPA] Loaded canonical tutor resources:', Object.keys(byActivityId).length, 'items');
+                return true;
+            } catch (e) {
+                console.warn('[Curriculum SPA] Failed to load canonical tutor resources. Using Knack content as-is.', e);
+                this._tutorCanonical = null;
+                return false;
+            }
+        })();
+        return this._tutorCanonicalLoaded;
+    }
+
+    normalizeId(value) {
+        return String(value ?? '').replace(/[^0-9]/g, '');
+    }
+
+    applyCanonicalOverrideIfPossible(activity) {
+        const canon = this._tutorCanonical;
+        if (!canon) return activity;
+        const aid = this.normalizeId(activity?.activityId);
+        const rid = String(activity?.id || '').trim();
+        const item = (aid && canon.byActivityId[aid]) ? canon.byActivityId[aid] : (rid && canon.byRecordId[rid] ? canon.byRecordId[rid] : null);
+        if (!item) return activity;
+
+        const lang = (getCurrentLanguage() === 'cy') ? 'cy' : 'en';
+        const title = item?.title?.[lang] || item?.title?.en || activity?.name || '';
+        const book = item?.book || activity?.book || '';
+        const month = item?.month || '';
+        const theme = item?.vespa_category || activity?.theme || 'General';
+        const rawHtml = item?.assets_raw?.slides?.[lang] || item?.assets_raw?.slides?.en || '';
+        const slideUrl = item?.assets?.slides?.[lang] || item?.assets?.slides?.en || '';
+        const pdfUrl = item?.assets?.pdf?.[lang] || item?.assets?.pdf?.en || '';
+
+        let content = rawHtml;
+        if (!content && slideUrl) {
+            content = `<iframe src="${slideUrl}" width="576" height="420" allowfullscreen></iframe>`;
+        }
+        // If content has no PDF link but we have a PDF URL, append a simple button.
+        if (pdfUrl && content && !content.includes('.pdf') && !content.toLowerCase().includes('download')) {
+            content += `\n<p style="text-align:center"><a href="${pdfUrl}" target="_blank" rel="noopener noreferrer"><strong>DOWNLOAD PDF</strong></a></p>`;
+        }
+
+        return {
+            ...activity,
+            name: title,
+            book,
+            theme,
+            group: month && book ? `${month} - ${book}` : (activity?.group || null),
+            activityId: item?.activity_id || activity?.activityId,
+            content: content || activity?.content || ''
+        };
+    }
+
     async fetchFromSupabase(path, params = {}) {
         if (!this.hasSupabase()) throw new Error('Supabase config missing');
         const url = new URL(`${this.supabase.url}/rest/v1/${path}`);
@@ -88,6 +161,7 @@ class CurriculumAPI {
     async getAllActivities() {
         if (this.hasSupabase()) return this.getAllActivitiesFromSupabase();
         if (this.allActivitiesCache) return this.allActivitiesCache;
+        await this.loadTutorCanonicalOnce();
         
         const isWelsh = getCurrentLanguage() === 'cy';
         const filters = isWelsh ? null : {
@@ -98,7 +172,7 @@ class CurriculumAPI {
         const records = await this.fetch('object_58', filters);
         console.log('[API] Fetched', records.length, 'total activities (all books)');
         
-        this.allActivitiesCache = records.map(r => ({
+        const mapped = records.map(r => ({
             id: r.id, 
             book: r.field_2702, 
             activityId: r.field_1446,
@@ -107,6 +181,7 @@ class CurriculumAPI {
             group: r.field_1435_raw || r.field_1435,
             content: r.field_1448_raw || r.field_1448
         }));
+        this.allActivitiesCache = mapped.map(a => this.applyCanonicalOverrideIfPossible(a));
         
         return this.allActivitiesCache;
     }
@@ -162,6 +237,7 @@ class CurriculumAPI {
 
     async getActivities(bookName) {
         if (this.hasSupabase()) return this.getActivitiesFromSupabase(bookName);
+        await this.loadTutorCanonicalOnce();
         const filters = {
             match: 'and',
             rules: [
@@ -175,7 +251,7 @@ class CurriculumAPI {
         const records = await this.fetch('object_58', filters);
         console.log('[API] Fetched', records.length, 'NON-Welsh activities');
         
-        return records.map(r => ({
+        const mapped = records.map(r => ({
             id: r.id,
             book: r.field_2702,
             activityId: r.field_1446,
@@ -184,6 +260,19 @@ class CurriculumAPI {
             group: r.field_1435_raw || r.field_1435,
             content: r.field_1448_raw || r.field_1448
         }));
+
+        // If canonical exists, filter to canonical items for this book to avoid duplicates.
+        if (this._tutorCanonical?.byActivityId) {
+            const canon = this._tutorCanonical.byActivityId;
+            const filtered = mapped.filter((a) => {
+                const aid = this.normalizeId(a?.activityId);
+                const item = aid ? canon[aid] : null;
+                return Boolean(item && String(item.book || '') === String(bookName || ''));
+            });
+            return filtered.map(a => this.applyCanonicalOverrideIfPossible(a));
+        }
+
+        return mapped.map(a => this.applyCanonicalOverrideIfPossible(a));
     }
 
     async getActivitiesFromSupabase(bookName) {
@@ -324,6 +413,18 @@ const getSupabaseConfig = () => {
         key: cfg.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || ''
     };
 };
+
+// ===== MODE BADGE (helps diagnose Supabase vs Knack) =====
+function renderDataSourceBadge(text) {
+    try {
+        if (document.getElementById('vespa-curriculum-source-badge')) return;
+        const el = document.createElement('div');
+        el.id = 'vespa-curriculum-source-badge';
+        el.textContent = text;
+        el.style.cssText = 'position:fixed;bottom:10px;right:10px;z-index:999999;padding:8px 10px;border-radius:10px;background:rgba(15,23,42,0.88);color:#fff;font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial;box-shadow:0 6px 20px rgba(0,0,0,0.2);';
+        document.body.appendChild(el);
+    } catch (_) {}
+}
 
 const loadWelshOverrides = async () => {
     if (welshOverrideCache) return welshOverrideCache;
@@ -1024,6 +1125,15 @@ window.initializeCurriculumSPA = async function() {
     
     const config = window.CURRICULUM_RESOURCES_CONFIG;
     if (!config) return;
+
+    // Visible indicator of data source. If you see Knack mode here, Supabase URL/key are not configured on the page.
+    try {
+        const hasSb = Boolean((config.supabaseUrl || window.VESPA_SUPABASE_URL) && (config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY));
+        renderDataSourceBadge(hasSb ? 'Curriculum: Supabase mode' : 'Curriculum: Knack mode (Supabase OFF)');
+        if (!hasSb) {
+            console.warn('[Curriculum SPA] Supabase OFF: no supabaseUrl/supabaseAnonKey found. Using Knack + canonical overrides from tutoractivities_nested_from_csv.json');
+        }
+    } catch (_) {}
     
     let attempts = 0;
     const wait = setInterval(() => {
