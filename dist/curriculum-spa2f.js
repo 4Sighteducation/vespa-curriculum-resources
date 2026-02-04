@@ -1,8 +1,22 @@
 /**
  * VESPA Curriculum SPA v2f - FIXED: Completion saving + Problem search with dynamic mapping
+ *
+ * IMPORTANT:
+ * This bundle is sometimes injected more than once by the host loader.
+ * We wrap everything in an IIFE and guard against re-execution to avoid
+ * "Identifier has already been declared" errors (e.g. `const U = ...`).
  */
 
-console.log('[Curriculum SPA v2f] Loading...');
+(function () {
+    try {
+        if (window.__VESPA_CURRICULUM_SPA2F_LOADED) {
+            // Already loaded/evaluated; do not redeclare globals.
+            return;
+        }
+        window.__VESPA_CURRICULUM_SPA2F_LOADED = true;
+    } catch (_) {}
+
+    console.log('[Curriculum SPA v2f] Loading...');
 
 // ===== API CLASS =====
 class CurriculumAPI {
@@ -1315,4 +1329,5 @@ window.P2 = P2;
 window.P3 = P3;
 
 console.log('[Curriculum SPA v2f] All loaded!');
+}());
 

@@ -3,6 +3,12 @@
  * Handles all data fetching and caching for curriculum resources
  */
 
+// Defensive: in some Knack/Loader contexts scripts can be injected more than once.
+// Avoid re-declaring the class globally by short-circuiting if it already exists.
+if (typeof window !== 'undefined' && window.CurriculumAPI) {
+    // eslint-disable-next-line no-console
+    console.info('[Curriculum API] Already loaded; skipping redefinition.');
+} else {
 class CurriculumAPI {
     constructor(config) {
         this.config = config;
@@ -799,4 +805,5 @@ class CurriculumAPI {
 
 // Export for use in other modules
 window.CurriculumAPI = CurriculumAPI;
+}
 
