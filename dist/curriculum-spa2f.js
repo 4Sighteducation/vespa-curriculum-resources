@@ -1192,7 +1192,7 @@ const P3 = {
                         <div class="action-buttons">
                             ${isCompleted 
                                 ? '<div class="completed-banner">✓ You completed this activity</div>'
-                                : '<button class="btn-complete" onclick="P3.complete()">✓ Complete and Continue</button>'}
+                                : '<button class="btn-complete" onclick="P3.complete()">✓ Complete</button>'}
                             ${pdf ? `<button class="btn-pdf" onclick="P3.openPdfModal()">📄 View PDF</button>` : ''}
                         </div>
                     </div>
@@ -1288,7 +1288,7 @@ const P3 = {
             console.error('[P3] Completion error:', e);
             alert('Failed to save completion. Please try again.');
             btn.disabled = false;
-            btn.textContent = '✓ Complete and Continue';
+            btn.textContent = '✓ Complete';
         }
     },
     
