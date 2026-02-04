@@ -716,7 +716,8 @@ const U = {
     getColor(theme) { return this.colors[theme?.trim()] || this.colors[theme?.trim().toUpperCase()] || '#079baa'; },
     iframe(html) { 
         if (!html) return null;
-        if (html.trim().startsWith('<iframe')) return html;
+        // Always extract ONLY the first iframe. Do NOT return the full HTML blob,
+        // otherwise multiple iframes (slides + pdf + youtube, etc.) will stack.
         const m = html.match(/<iframe[^>]*>[\s\S]*?<\/iframe>/i);
         return m ? m[0] : null;
     },
@@ -1163,6 +1164,8 @@ const P3 = {
         const activityContent = getActivityDisplayContent(activity);
         const iframe = U.iframe(activityContent);
         const pdf = U.pdf(activityContent);
+        // store for modal open
+        State._pdfUrl = pdf || null;
         
         c.innerHTML = `
             <div class="viewer-container">
@@ -1190,7 +1193,7 @@ const P3 = {
                             ${isCompleted 
                                 ? '<div class="completed-banner">✓ You completed this activity</div>'
                                 : '<button class="btn-complete" onclick="P3.complete()">✓ Complete and Continue</button>'}
-                            ${pdf ? `<a href="${pdf}" target="_blank" class="btn-pdf">📄 Download PDF</a>` : ''}
+                            ${pdf ? `<button class="btn-pdf" onclick="P3.openPdfModal()">📄 View PDF</button>` : ''}
                         </div>
                     </div>
                     
@@ -1223,7 +1226,52 @@ const P3 = {
                     <button class="btn-nav" onclick="P1.show(window.api)">📚 Back to Books</button>
                 </div>
             </div>
+
+            ${pdf ? `
+            <div id="vespaPdfModalOverlay" class="vespa-pdf-modal-overlay" style="display:none" onclick="P3.closePdfModal()"></div>
+            <div id="vespaPdfModal" class="vespa-pdf-modal" style="display:none" role="dialog" aria-modal="true" aria-label="PDF viewer">
+                <div class="vespa-pdf-modal-header">
+                    <div class="vespa-pdf-modal-title">PDF</div>
+                    <button class="vespa-pdf-modal-close" onclick="P3.closePdfModal()">×</button>
+                </div>
+                <div class="vespa-pdf-modal-body">
+                    <iframe id="vespaPdfModalFrame" src="" width="100%" height="100%" loading="lazy"></iframe>
+                </div>
+            </div>
+            ` : ''}
         `;
+    },
+
+    openPdfModal() {
+        const pdf = State._pdfUrl || null;
+        if (!pdf) return;
+        const overlay = document.getElementById('vespaPdfModalOverlay');
+        const modal = document.getElementById('vespaPdfModal');
+        const frame = document.getElementById('vespaPdfModalFrame');
+        if (!overlay || !modal || !frame) return;
+        frame.src = pdf;
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+        // Escape closes
+        try {
+            this._onPdfEsc = (e) => {
+                if (e.key === 'Escape') this.closePdfModal();
+            };
+            document.addEventListener('keydown', this._onPdfEsc);
+        } catch (_) {}
+    },
+
+    closePdfModal() {
+        const overlay = document.getElementById('vespaPdfModalOverlay');
+        const modal = document.getElementById('vespaPdfModal');
+        const frame = document.getElementById('vespaPdfModalFrame');
+        if (overlay) overlay.style.display = 'none';
+        if (modal) modal.style.display = 'none';
+        if (frame) frame.src = '';
+        try {
+            if (this._onPdfEsc) document.removeEventListener('keydown', this._onPdfEsc);
+            this._onPdfEsc = null;
+        } catch (_) {}
     },
     
     async complete() {
