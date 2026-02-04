@@ -396,9 +396,6 @@ class CurriculumAPI {
         const params = {
             select: 'id,name,vespa_category,knack_id,knack_activity_id,book,month,theme,content,think_section_html'
         };
-        if (bookName) {
-            params['content->>book'] = `eq.${bookName}`;
-        }
         // Always use English/base rows; Welsh assets are applied via overrides when cy is active.
         params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
         const records = await this.fetchFromSupabase('activities', params);
@@ -409,13 +406,16 @@ class CurriculumAPI {
                 c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
             );
         };
-        return records
+        const mapped = records
             .filter((r) => {
                 const rt = String(r?.content?.resource_type || '').toLowerCase();
                 if (rt === 'worksheet' || rt === 'activity') return true;
                 return hasTutorAssets(r);
             })
             .map(r => this.buildSupabaseActivity(r));
+        // IMPORTANT: many staff/handbook rows store `book`/`month` in real columns,
+        // not in `content`, so we filter by the mapped value client-side.
+        return bookName ? mapped.filter((a) => String(a.book || '') === String(bookName || '')) : mapped;
     }
 
     async getUserCompletions() {

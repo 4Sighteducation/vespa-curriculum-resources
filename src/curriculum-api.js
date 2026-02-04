@@ -700,8 +700,8 @@ class CurriculumAPI {
                     c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
                 );
                 if (rt !== 'worksheet' && rt !== 'activity' && !hasTutorAssets) return;
-                const book = record.content?.book || '';
-                const month = record.content?.month || 'Other';
+                const book = record.content?.book || record.book || '';
+                const month = record.content?.month || record.month || 'Other';
                 const key = `${month} - ${book}`;
                 if (!groupsMap.has(key)) {
                     groupsMap.set(key, {
@@ -740,16 +740,8 @@ class CurriculumAPI {
                 select: 'id,name,vespa_category,level,knack_id,content,think_section_html,created_at',
             };
 
-            if (bookName) {
-                params['content->>book'] = `eq.${bookName}`;
-            }
-
-            if (groupName) {
-                const month = groupName.split(' - ')[0];
-                if (month) {
-                    params['content->>month'] = `eq.${month}`;
-                }
-            }
+            // NOTE: `book`/`month` can exist either in `content` JSON or as real columns.
+            // We fetch broadly then filter client-side using the normalized mapped activity.
             if (!this.isWelshActive()) {
                 params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
             }
@@ -803,7 +795,17 @@ class CurriculumAPI {
                     otherLanguage: record.content?.other_language || ''
                 };
             });
-            const cleanedActivities = activities.filter(Boolean);
+            let cleanedActivities = activities.filter(Boolean);
+
+            if (bookName) {
+                cleanedActivities = cleanedActivities.filter((a) => String(a.book || '') === String(bookName || ''));
+            }
+            if (groupName) {
+                const month = groupName.split(' - ')[0];
+                if (month) {
+                    cleanedActivities = cleanedActivities.filter((a) => String(a.group || '').startsWith(String(month)));
+                }
+            }
 
             if (!bookName && !groupName) {
                 this.cache.activities = cleanedActivities;
