@@ -8,7 +8,8 @@ class CurriculumAPI {
         this.config = config;
         this.supabase = {
             url: config.supabaseUrl || window.VESPA_SUPABASE_URL || '',
-            key: config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || ''
+            key: config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || '',
+            mode: (config.supabaseMode || window.VESPA_SUPABASE_MODE || 'auto').toString()
         };
         this.cache = {
             books: null,
@@ -51,6 +52,21 @@ class CurriculumAPI {
      */
     hasSupabase() {
         return Boolean(this.supabase.url && this.supabase.key);
+    }
+
+    getSupabaseMode() {
+        return (this.supabase.mode || 'auto').toString().toLowerCase();
+    }
+
+    shouldUseSupabase() {
+        const mode = this.getSupabaseMode();
+        if (mode === 'off' || mode === 'knack' || mode === 'false') {
+            return false;
+        }
+        if (!this.hasSupabase()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -152,8 +168,12 @@ class CurriculumAPI {
      * Get all books (Object_56)
      */
     async getBooks() {
-        if (this.hasSupabase()) {
-            return this.getBooksFromSupabase();
+        if (this.shouldUseSupabase()) {
+            try {
+                return await this.getBooksFromSupabase();
+            } catch (error) {
+                console.warn('[Curriculum API] Supabase failed for books, falling back to Knack.', error);
+            }
         }
 
         if (this.isCacheValid('books')) {
@@ -180,8 +200,12 @@ class CurriculumAPI {
      * Get activity groups (Object_57) - Monthly curriculum
      */
     async getActivityGroups(bookName = null) {
-        if (this.hasSupabase()) {
-            return this.getGroupsFromSupabase(bookName);
+        if (this.shouldUseSupabase()) {
+            try {
+                return await this.getGroupsFromSupabase(bookName);
+            } catch (error) {
+                console.warn('[Curriculum API] Supabase failed for groups, falling back to Knack.', error);
+            }
         }
 
         if (this.isCacheValid('groups') && !bookName) {
@@ -231,8 +255,12 @@ class CurriculumAPI {
      * Get all activities (Object_58)
      */
     async getActivities(bookName = null, groupName = null) {
-        if (this.hasSupabase()) {
-            return this.getActivitiesFromSupabase(bookName, groupName);
+        if (this.shouldUseSupabase()) {
+            try {
+                return await this.getActivitiesFromSupabase(bookName, groupName);
+            } catch (error) {
+                console.warn('[Curriculum API] Supabase failed for activities, falling back to Knack.', error);
+            }
         }
 
         if (this.isCacheValid('activities') && !bookName && !groupName) {
@@ -607,11 +635,12 @@ class CurriculumAPI {
         try {
             const records = await this.fetchFromSupabase('activities', {
                 select: 'content',
-                'content->>resource_type': 'eq.worksheet'
             });
 
             const booksMap = new Map();
             records.forEach((record) => {
+                const rt = String(record.content?.resource_type || '').toLowerCase();
+                if (rt !== 'worksheet' && rt !== 'activity') return;
                 const book = record.content?.book;
                 if (book && !booksMap.has(book)) {
                     booksMap.set(book, {
@@ -644,7 +673,6 @@ class CurriculumAPI {
         try {
             const params = {
                 select: 'content',
-                'content->>resource_type': 'eq.worksheet'
             };
             if (bookName) {
                 params['content->>book'] = `eq.${bookName}`;
@@ -654,6 +682,8 @@ class CurriculumAPI {
             const groupsMap = new Map();
 
             records.forEach((record) => {
+                const rt = String(record.content?.resource_type || '').toLowerCase();
+                if (rt !== 'worksheet' && rt !== 'activity') return;
                 const book = record.content?.book || '';
                 const month = record.content?.month || 'Other';
                 const key = `${month} - ${book}`;
@@ -692,7 +722,6 @@ class CurriculumAPI {
         try {
             const params = {
                 select: 'id,name,vespa_category,level,knack_id,content,think_section_html,created_at',
-                'content->>resource_type': 'eq.worksheet'
             };
 
             if (bookName) {
@@ -712,17 +741,33 @@ class CurriculumAPI {
             const records = await this.fetchFromSupabase('activities', params);
 
             const activities = records.map((record) => {
+                const rt = String(record.content?.resource_type || '').toLowerCase();
+                if (rt !== 'worksheet' && rt !== 'activity') return null;
                 const book = record.content?.book || '';
                 const month = record.content?.month || '';
                 const theme = record.content?.theme || record.vespa_category;
                 const activityId = record.content?.activity_code || record.knack_id || record.id;
+                const slidesEmbedHtml = record.content?.slides_embed_en || record.content?.slides_embed || '';
+                const slidesUrl = record.content?.slides_url_en || record.content?.slides_url || '';
+                const slidesIframe = slidesEmbedHtml
+                    ? slidesEmbedHtml
+                    : (slidesUrl
+                        ? `<iframe src="${slidesUrl}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>`
+                        : '');
+
+                const pdfEmbedHtml = record.content?.pdf_embed || '';
+                const pdfDownloadHtml = record.content?.pdf_download_html || '';
+                const pdfUrl = record.content?.pdf_url_en || record.content?.pdf_url || '';
+
                 const embedHtml = [
-                    record.content?.pdf_embed,
-                    record.content?.pdf_download_html,
+                    slidesIframe,
+                    pdfEmbedHtml,
+                    pdfDownloadHtml,
+                    (!pdfEmbedHtml && !pdfDownloadHtml && pdfUrl)
+                        ? `<p style="text-align:center"><a href="${pdfUrl}" target="_blank" rel="noopener noreferrer"><strong>DOWNLOAD PDF</strong></a></p>`
+                        : '',
                     record.think_section_html
-                ]
-                    .filter(Boolean)
-                    .join('\n');
+                ].filter(Boolean).join('\n');
 
                 return {
                     id: record.id,
@@ -737,13 +782,14 @@ class CurriculumAPI {
                     otherLanguage: record.content?.other_language || ''
                 };
             });
+            const cleanedActivities = activities.filter(Boolean);
 
             if (!bookName && !groupName) {
-                this.cache.activities = activities;
+                this.cache.activities = cleanedActivities;
                 this.cache.lastFetch.activities = Date.now();
             }
 
-            return activities;
+            return cleanedActivities;
         } catch (error) {
             console.error('[Curriculum API] Failed to fetch activities from Supabase:', error);
             return [];

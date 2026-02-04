@@ -10,7 +10,8 @@ class CurriculumAPI {
         this.config = config;
         this.supabase = {
             url: config.supabaseUrl || window.VESPA_SUPABASE_URL || '',
-            key: config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || ''
+            key: config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY || '',
+            mode: (config.supabaseMode || window.VESPA_SUPABASE_MODE || 'auto').toString()
         };
         this.allActivitiesCache = null;
         this.problemMappingsCache = null; // Cache for problem mappings
@@ -39,6 +40,21 @@ class CurriculumAPI {
 
     hasSupabase() {
         return Boolean(this.supabase.url && this.supabase.key);
+    }
+
+    getSupabaseMode() {
+        return (this.supabase.mode || 'auto').toString().toLowerCase();
+    }
+
+    shouldUseSupabase() {
+        const mode = this.getSupabaseMode();
+        if (mode === 'off' || mode === 'knack' || mode === 'false') {
+            return false;
+        }
+        if (!this.hasSupabase()) {
+            return false;
+        }
+        return true;
     }
 
     // --- Canonical tutor resources overrides (used when Supabase is not configured) ---
@@ -134,39 +150,96 @@ class CurriculumAPI {
     }
 
     buildSupabaseActivity(record) {
-        const book = record.content?.book || '';
-        const month = record.content?.month || '';
-        const theme = record.content?.theme || record.vespa_category || 'General';
-        const activityId = record.content?.activity_code || record.knack_id || record.id;
-        const embedHtml = [
-            record.content?.pdf_embed,
-            record.content?.pdf_download_html,
-            record.think_section_html
-        ]
-            .filter(Boolean)
-            .join('\n');
+        const book = record.content?.book || record.book || '';
+        const month = record.content?.month || record.month || '';
+        const theme = record.content?.theme || record.vespa_category || record.theme || 'General';
+
+        // Stable "activityId" for display/search (not necessarily a numeric ID)
+        const activityId =
+            record.content?.activity_code ||
+            record.content?.activity_id ||
+            record.knack_activity_id ||
+            record.knack_id ||
+            record.id;
+
+        const buildSlidesEmbedUrl = (url) => {
+            if (!url) return '';
+            try {
+                const u = new URL(url);
+                // slides.com needs /embed for iframe embeds
+                if (u.hostname.includes('slides.com')) {
+                    if (u.pathname.endsWith('/fullscreen')) {
+                        u.pathname = u.pathname.replace(/\/fullscreen$/, '/embed');
+                    } else if (!u.pathname.endsWith('/embed')) {
+                        u.pathname = `${u.pathname.replace(/\/$/, '')}/embed`;
+                    }
+                    // Normalize token query (sometimes gets duplicated)
+                    if (u.searchParams.has('token')) {
+                        const rawToken = u.searchParams.get('token') || '';
+                        const cleanToken = rawToken.split('?')[0].split('&')[0];
+                        u.searchParams.set('token', cleanToken);
+                    }
+                    return u.toString();
+                }
+                return url;
+            } catch (_) {
+                return url;
+            }
+        };
+
+        const slidesEmbedHtml =
+            record.content?.slides_embed_en ||
+            record.content?.slides_embed ||
+            '';
+        const slidesUrl =
+            record.content?.slides_url_en ||
+            record.content?.slides_url ||
+            '';
+        const slidesIframe = slidesEmbedHtml
+            ? slidesEmbedHtml
+            : (slidesUrl
+                ? `<iframe src="${buildSlidesEmbedUrl(slidesUrl)}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>`
+                : '');
+
+        const pdfEmbedHtml = record.content?.pdf_embed || '';
+        const pdfDownloadHtml = record.content?.pdf_download_html || '';
+        const pdfUrl =
+            record.content?.pdf_url_en ||
+            record.content?.pdf_url ||
+            '';
+
+        // Build a single HTML blob that includes (in order):
+        // slides (if available), pdf embed/download (if available), then any legacy html
+        const parts = [];
+        if (slidesIframe) parts.push(slidesIframe);
+        if (pdfEmbedHtml) parts.push(pdfEmbedHtml);
+        if (pdfDownloadHtml) parts.push(pdfDownloadHtml);
+        if (!pdfEmbedHtml && !pdfDownloadHtml && pdfUrl) {
+            parts.push(
+                `<p style="text-align:center"><a href="${pdfUrl}" target="_blank" rel="noopener noreferrer"><strong>DOWNLOAD PDF</strong></a></p>`
+            );
+        }
+        if (record.think_section_html) parts.push(record.think_section_html);
 
         return {
             id: record.id,
-            book: book,
-            activityId: activityId,
-            theme: theme,
+            book,
+            activityId,
+            theme,
             name: record.name,
             group: month && book ? `${month} - ${book}` : null,
-            content: embedHtml
+            content: parts.filter(Boolean).join('\n')
         };
     }
     
     // Get ALL activities (all books) for problem search
     async getAllActivities() {
-        if (this.hasSupabase()) {
+        if (this.shouldUseSupabase()) {
             try {
                 return await this.getAllActivitiesFromSupabase();
             } catch (e) {
                 // If Supabase isn't accessible (e.g. anon key invalid / RLS misconfigured), fall back to Knack.
                 console.warn('[Curriculum SPA] Supabase unavailable for activities; falling back to Knack.', e);
-                this.supabase.url = '';
-                this.supabase.key = '';
             }
         }
         if (this.allActivitiesCache) return this.allActivitiesCache;
@@ -198,14 +271,18 @@ class CurriculumAPI {
     async getAllActivitiesFromSupabase() {
         if (this.allActivitiesCache) return this.allActivitiesCache;
         const params = {
-            select: 'id,name,vespa_category,knack_id,content,think_section_html',
-            'content->>resource_type': 'eq.worksheet'
+            // Pull enough fields to render slides + pdf resources from `content`
+            select: 'id,name,vespa_category,knack_id,knack_activity_id,book,month,theme,content,think_section_html'
         };
-        if (getCurrentLanguage() !== 'cy') {
-            params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
-        }
+        // Always use English/base rows; Welsh assets are applied via overrides when cy is active.
+        params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
         const records = await this.fetchFromSupabase('activities', params);
-        this.allActivitiesCache = records.map(r => this.buildSupabaseActivity(r));
+        this.allActivitiesCache = records
+            .filter((r) => {
+                const rt = String(r?.content?.resource_type || '').toLowerCase();
+                return rt === 'worksheet' || rt === 'activity';
+            })
+            .map(r => this.buildSupabaseActivity(r));
         return this.allActivitiesCache;
     }
 
@@ -245,14 +322,12 @@ class CurriculumAPI {
     }
 
     async getActivities(bookName) {
-        if (this.hasSupabase()) {
+        if (this.shouldUseSupabase()) {
             try {
                 return await this.getActivitiesFromSupabase(bookName);
             } catch (e) {
                 // If Supabase isn't accessible (e.g. anon key invalid / RLS misconfigured), fall back to Knack.
                 console.warn('[Curriculum SPA] Supabase unavailable for activities; falling back to Knack.', e);
-                this.supabase.url = '';
-                this.supabase.key = '';
             }
         }
         await this.loadTutorCanonicalOnce();
@@ -295,17 +370,20 @@ class CurriculumAPI {
 
     async getActivitiesFromSupabase(bookName) {
         const params = {
-            select: 'id,name,vespa_category,knack_id,content,think_section_html',
-            'content->>resource_type': 'eq.worksheet'
+            select: 'id,name,vespa_category,knack_id,knack_activity_id,book,month,theme,content,think_section_html'
         };
         if (bookName) {
             params['content->>book'] = `eq.${bookName}`;
         }
-        if (getCurrentLanguage() !== 'cy') {
-            params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
-        }
+        // Always use English/base rows; Welsh assets are applied via overrides when cy is active.
+        params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
         const records = await this.fetchFromSupabase('activities', params);
-        return records.map(r => this.buildSupabaseActivity(r));
+        return records
+            .filter((r) => {
+                const rt = String(r?.content?.resource_type || '').toLowerCase();
+                return rt === 'worksheet' || rt === 'activity';
+            })
+            .map(r => this.buildSupabaseActivity(r));
     }
 
     async getUserCompletions() {
@@ -454,7 +532,12 @@ const loadWelshOverrides = async () => {
         return welshOverrideCache;
     }
     const baseUrl = url.replace(/\/$/, '');
-    const endpoint = `${baseUrl}/rest/v1/activities?select=name,book,knack_id,knack_activity_id,name_cy,slides_url_cy,slides_embed_cy&or=(name_cy.not.is.null,slides_url_cy.not.is.null,slides_embed_cy.not.is.null)`;
+    // Pull only rows that have *any* Welsh asset override fields.
+    // Note: `pdf_url_cy` lives inside `content` JSON for many rows.
+    const endpoint =
+        `${baseUrl}/rest/v1/activities` +
+        `?select=name,book,knack_id,knack_activity_id,name_cy,slides_url_cy,slides_embed_cy,content` +
+        `&or=(name_cy.not.is.null,slides_url_cy.not.is.null,slides_embed_cy.not.is.null,content->>pdf_url_cy.not.is.null)`;
     try {
         const normalizeId = (value) => String(value || '').toLowerCase().replace(/[^0-9]/g, '');
         const normalizeText = (value) => String(value || '').toLowerCase().trim();
@@ -473,11 +556,16 @@ const loadWelshOverrides = async () => {
             const bookKey = normalizeText(item.book);
             const activityKey = normalizeId(item.knack_activity_id);
             const recordKey = normalizeText(item.knack_id);
+            const codeKey = normalizeText(item.content?.activity_code || item.content?.activity_id || '');
             const payload = {
                 name_cy: item.name_cy || null,
                 slides_url_cy: item.slides_url_cy || null,
-                slides_embed_cy: item.slides_embed_cy || null
+                slides_embed_cy: item.slides_embed_cy || null,
+                pdf_url_cy: item.content?.pdf_url_cy || null
             };
+            if (codeKey) {
+                map[`code:${codeKey}`] = payload;
+            }
             if (nameKey) {
                 map[`${nameKey}|${bookKey}`] = payload;
             }
@@ -532,10 +620,12 @@ const getWelshOverride = (activity) => {
     const map = welshOverrideCache || {};
     const normalizeId = (value) => String(value || '').toLowerCase().replace(/[^0-9]/g, '');
     const normalizeText = (value) => String(value || '').toLowerCase().trim();
+    const codeKey = normalizeText(activity?.activityId);
     const activityKey = normalizeId(activity?.activityId);
     const recordKey = normalizeText(activity?.id);
     const nameKey = normalizeText(activity?.name);
     const bookKey = normalizeText(activity?.book);
+    if (codeKey && map[`code:${codeKey}`]) return map[`code:${codeKey}`];
     if (activityKey && map[`id:${activityKey}`]) return map[`id:${activityKey}`];
     if (recordKey && map[`knack:${recordKey}`]) return map[`knack:${recordKey}`];
     if (!nameKey) return null;
@@ -553,7 +643,7 @@ const getActivityDisplayName = (activity) => {
 const getActivityDisplayContent = (activity) => {
     if (getCurrentLanguage() !== 'cy') return activity?.content || '';
     const override = getWelshOverride(activity);
-    const pdf = U.pdf(activity?.content || '');
+    const pdf = override?.pdf_url_cy || U.pdf(activity?.content || '');
     const buildEmbedUrl = (url) => {
         if (!url) return '';
         try {
@@ -580,7 +670,11 @@ const getActivityDisplayContent = (activity) => {
     const embedUrl = override?.slides_url_cy ? buildEmbedUrl(override.slides_url_cy) : '';
     const embed = override?.slides_embed_cy
         || (embedUrl ? `<iframe src="${embedUrl}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>` : null);
-    if (embed) return pdf ? `${embed}<a href="${pdf}">PDF</a>` : embed;
+    if (embed) return pdf ? `${embed}<a href="${pdf}" target="_blank" rel="noopener noreferrer">PDF</a>` : embed;
+    // If we only have a Welsh PDF override, append it so users still get the correct download.
+    if (pdf && pdf !== U.pdf(activity?.content || '')) {
+        return `${activity?.content || ''}\n<p style="text-align:center"><a href="${pdf}" target="_blank" rel="noopener noreferrer"><strong>LAWRLWYTHWCH PDF</strong></a></p>`;
+    }
     return activity?.content || '';
 };
 
@@ -1147,8 +1241,11 @@ window.initializeCurriculumSPA = async function() {
     if (!config) return;
 
     try {
+        const mode = (config.supabaseMode || window.VESPA_SUPABASE_MODE || 'auto').toString().toLowerCase();
         const hasSb = Boolean((config.supabaseUrl || window.VESPA_SUPABASE_URL) && (config.supabaseAnonKey || window.VESPA_SUPABASE_ANON_KEY));
-        if (hasSb) {
+        if (mode === 'off' || mode === 'knack' || mode === 'false') {
+            console.warn('[Curriculum SPA] Supabase OFF (mode): using Knack + canonical overrides from tutoractivities_nested_from_csv.json');
+        } else if (hasSb) {
             console.info('[Curriculum SPA] Supabase ON: using Supabase data source');
         } else {
             console.warn('[Curriculum SPA] Supabase OFF: no supabaseUrl/supabaseAnonKey found. Using Knack + canonical overrides from tutoractivities_nested_from_csv.json');
