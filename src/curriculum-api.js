@@ -646,7 +646,12 @@ class CurriculumAPI {
             const booksMap = new Map();
             records.forEach((record) => {
                 const rt = String(record.content?.resource_type || '').toLowerCase();
-                if (rt !== 'worksheet' && rt !== 'activity') return;
+                const c = record.content || {};
+                const hasTutorAssets = Boolean(
+                    c.slides_url_en || c.slides_embed_en || c.slides_url || c.slides_embed ||
+                    c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
+                );
+                if (rt !== 'worksheet' && rt !== 'activity' && !hasTutorAssets) return;
                 const book = record.content?.book;
                 if (book && !booksMap.has(book)) {
                     booksMap.set(book, {
@@ -689,7 +694,12 @@ class CurriculumAPI {
 
             records.forEach((record) => {
                 const rt = String(record.content?.resource_type || '').toLowerCase();
-                if (rt !== 'worksheet' && rt !== 'activity') return;
+                const c = record.content || {};
+                const hasTutorAssets = Boolean(
+                    c.slides_url_en || c.slides_embed_en || c.slides_url || c.slides_embed ||
+                    c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
+                );
+                if (rt !== 'worksheet' && rt !== 'activity' && !hasTutorAssets) return;
                 const book = record.content?.book || '';
                 const month = record.content?.month || 'Other';
                 const key = `${month} - ${book}`;
@@ -748,7 +758,12 @@ class CurriculumAPI {
 
             const activities = records.map((record) => {
                 const rt = String(record.content?.resource_type || '').toLowerCase();
-                if (rt !== 'worksheet' && rt !== 'activity') return null;
+                const c = record.content || {};
+                const hasTutorAssets = Boolean(
+                    c.slides_url_en || c.slides_embed_en || c.slides_url || c.slides_embed ||
+                    c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
+                );
+                if (rt !== 'worksheet' && rt !== 'activity' && !hasTutorAssets) return null;
                 const book = record.content?.book || '';
                 const month = record.content?.month || '';
                 const theme = record.content?.theme || record.vespa_category;

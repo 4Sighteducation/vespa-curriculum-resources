@@ -291,10 +291,20 @@ class CurriculumAPI {
         // Always use English/base rows; Welsh assets are applied via overrides when cy is active.
         params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
         const records = await this.fetchFromSupabase('activities', params);
+        const hasTutorAssets = (r) => {
+            const c = r?.content || {};
+            return Boolean(
+                c.slides_url_en || c.slides_embed_en || c.slides_url || c.slides_embed ||
+                c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
+            );
+        };
         this.allActivitiesCache = records
             .filter((r) => {
                 const rt = String(r?.content?.resource_type || '').toLowerCase();
-                return rt === 'worksheet' || rt === 'activity';
+                // Many older "activity" (slides) rows were inserted without `resource_type`.
+                // Keep them if they have any usable slides/pdf assets.
+                if (rt === 'worksheet' || rt === 'activity') return true;
+                return hasTutorAssets(r);
             })
             .map(r => this.buildSupabaseActivity(r));
         return this.allActivitiesCache;
@@ -392,10 +402,18 @@ class CurriculumAPI {
         // Always use English/base rows; Welsh assets are applied via overrides when cy is active.
         params.or = '(content->>is_welsh.is.null,content->>is_welsh.eq.false)';
         const records = await this.fetchFromSupabase('activities', params);
+        const hasTutorAssets = (r) => {
+            const c = r?.content || {};
+            return Boolean(
+                c.slides_url_en || c.slides_embed_en || c.slides_url || c.slides_embed ||
+                c.pdf_url_en || c.pdf_url || c.pdf_embed || c.pdf_download_html
+            );
+        };
         return records
             .filter((r) => {
                 const rt = String(r?.content?.resource_type || '').toLowerCase();
-                return rt === 'worksheet' || rt === 'activity';
+                if (rt === 'worksheet' || rt === 'activity') return true;
+                return hasTutorAssets(r);
             })
             .map(r => this.buildSupabaseActivity(r));
     }
