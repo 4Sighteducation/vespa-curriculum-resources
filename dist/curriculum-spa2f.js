@@ -1280,7 +1280,7 @@ const P3 = {
                         
                         <div class="action-buttons">
                             ${isCompleted 
-                                ? '<div class="completed-banner">✓ You completed this activity</div>'
+                                ? '<button class="btn-complete is-completed" disabled>✓ Completed</button>'
                                 : '<button class="btn-complete" onclick="P3.complete()">✓ Complete</button>'}
                             ${pdf ? `<button class="btn-pdf" onclick="P3.openPdfModal()">📄 View PDF</button>` : ''}
                         </div>
@@ -1405,9 +1405,17 @@ const P3 = {
 
             // For testing, allow the secret to be set locally in the browser:
             //   localStorage.setItem('vespaEdgeSecret', '<secret>')
-            const edgeSecret = (typeof localStorage !== 'undefined')
-                ? (localStorage.getItem('vespaEdgeSecret') || '').toString()
-                : '';
+            const edgeSecret = (() => {
+                try {
+                    const fromLs = (typeof localStorage !== 'undefined') ? (localStorage.getItem('vespaEdgeSecret') || '') : '';
+                    const fromSs = (typeof sessionStorage !== 'undefined') ? (sessionStorage.getItem('vespaEdgeSecret') || '') : '';
+                    const fromCfg = (cfg.edgeSecret || cfg.vespaEdgeSecret || '');
+                    const fromGlobal = (typeof window !== 'undefined' && window.VESPA_EDGE_SECRET) ? window.VESPA_EDGE_SECRET : '';
+                    return String(fromLs || fromSs || fromCfg || fromGlobal || '').trim();
+                } catch (_) {
+                    return '';
+                }
+            })();
 
             const headers = { 'Content-Type': 'application/json' };
             if (edgeSecret) headers['x-vespa-edge-secret'] = edgeSecret;
@@ -1495,16 +1503,22 @@ const P3 = {
                 console.warn('[P3] Knack completion failed (non-blocking if Supabase ok):', e);
             }
 
+            const success = Boolean((sbRes && sbRes.ok) || knackOk);
+            if (!success) {
+                const detail = sbRes?.status ? `Supabase status ${sbRes.status}` : (sbRes?.reason || 'unknown');
+                throw new Error(`Completion not saved (${detail}).`);
+            }
+
             if (sbRes && sbRes.ok) {
                 U.toast(knackOk ? 'Activity completed! 🎉' : 'Saved! (Progress syncing...)');
             } else {
-                // If Supabase failed (e.g. secret missing) but Knack worked, still treat as complete.
                 U.toast('Activity completed! 🎉');
             }
             await this.show(window.api, State.activity.id);
         } catch (e) {
             console.error('[P3] Completion error:', e);
-            alert('Failed to save completion. Please try again.');
+            const msg = (e && e.message) ? e.message : 'Failed to save completion.';
+            alert(`${msg}\n\nIf you are using Supabase completions, ensure the Edge secret is available (e.g. localStorage/sessionStorage 'vespaEdgeSecret', or window.VESPA_EDGE_SECRET).`);
             btn.disabled = false;
             btn.textContent = '✓ Complete';
         }

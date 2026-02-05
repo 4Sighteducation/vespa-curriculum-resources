@@ -548,6 +548,22 @@
     box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
+.btn-complete:disabled,
+.btn-complete.is-completed {
+    background: #cfd8dc !important;
+    color: #455a64 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.9;
+}
+
+.btn-complete:disabled:hover,
+.btn-complete.is-completed:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 .btn-pdf {
     flex: 1;
     background: #ff6b35;
