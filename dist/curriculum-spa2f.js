@@ -313,7 +313,27 @@ class CurriculumAPI {
     getCurrentUser() {
         if (typeof Knack !== 'undefined' && Knack.getUserAttributes) {
             const user = Knack.getUserAttributes();
-            return { id: user.id, email: user.email, name: user.name || 'User' };
+            // IMPORTANT:
+            // - `user.id` is the Knack account id.
+            // - Completion field_1437 connects to object_7 (Tutor records), so we must use the Tutor record id.
+            //   Knack exposes this via `profile_keys` for the logged-in role/profile in many builds.
+            const getTutorRecordId = () => {
+                try {
+                    const pk = user.profile_keys || user.profileKeys || {};
+                    if (pk && typeof pk === 'object') {
+                        // Common shapes seen in Knack payloads
+                        if (pk.object_7) return pk.object_7;
+                        if (pk.profile_7) return pk.profile_7;
+                        if (pk.tutor) return pk.tutor;
+                        // If there's only one profile key, it's usually the active profile record id
+                        const vals = Object.values(pk).filter(v => typeof v === 'string' && v.length >= 16);
+                        if (vals.length === 1) return vals[0];
+                    }
+                } catch (_) {}
+                return '';
+            };
+            const tutorId = getTutorRecordId();
+            return { id: user.id, tutorId, email: user.email, name: user.name || 'User' };
         }
         return null;
     }
@@ -421,13 +441,22 @@ class CurriculumAPI {
     async getUserCompletions() {
         const user = this.getCurrentUser();
         if (!user) return [];
-        
-        const filters = {
+
+        // Primary: match Tutor connection (object_7 record id).
+        // Back-compat: if older records were created using account id, fall back to that.
+        const build = (val) => ({
             match: 'and',
-            rules: [{ field: 'field_1437', operator: 'is', value: user.id }]
-        };
-        
-        const records = await this.fetch('object_59', filters);
+            rules: [{ field: 'field_1437', operator: 'is', value: val }]
+        });
+
+        let records = [];
+        try {
+            if (user.tutorId) records = await this.fetch('object_59', build(user.tutorId));
+        } catch (_) {}
+        if (!records || records.length === 0) {
+            records = await this.fetch('object_59', build(user.id));
+        }
+
         return records.map(r => {
             let json = {};
             try {
@@ -489,7 +518,16 @@ class CurriculumAPI {
 
         // Otherwise, create a new completion record.
         // Knack connection fields usually accept an array of record IDs.
+        const tutorId = user.tutorId || '';
         const createAttempts = [
+            // Some Knack builds allow creating without setting the connection (if not required)
+            { field_1432: JSON.stringify(json) },
+            // Preferred: connect to the Tutor (object_7) record id
+            ...(tutorId ? [
+                { field_1437: [tutorId], field_1432: JSON.stringify(json) },
+                { field_1437: [{ id: tutorId }], field_1432: JSON.stringify(json) },
+            ] : []),
+            // Back-compat / last resort (may fail if field expects object_7 record id)
             { field_1437: [user.id], field_1432: JSON.stringify(json) },
             { field_1437: [{ id: user.id }], field_1432: JSON.stringify(json) }
         ];
