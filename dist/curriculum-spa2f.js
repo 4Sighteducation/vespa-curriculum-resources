@@ -462,33 +462,49 @@ class CurriculumAPI {
         
         if (!json[bookName]) json[bookName] = [];
         if (!json[bookName].includes(activityId)) json[bookName].push(activityId);
-        
-        // FIXED: Connection field needs array of objects with id property
-        const data = {
-            field_1437: [{id: user.id}], // ✅ CORRECT FORMAT
-            field_1432: JSON.stringify(json)
-        };
-        
         const url = completions.length > 0
             ? `https://eu-api.knack.com/v1/objects/object_59/records/${completions[0].id}`
             : 'https://eu-api.knack.com/v1/objects/object_59/records';
-        
-        const response = await fetch(url, {
-            method: completions.length > 0 ? 'PUT' : 'POST',
-            headers: {
-                'X-Knack-Application-Id': this.config.knackAppId,
-                'X-Knack-REST-API-Key': this.config.knackApiKey,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (!response.ok) {
-            const error = await response.text();
-            console.error('[API] Completion failed:', error);
-            throw new Error('Failed to save completion');
+
+        const headers = {
+            'X-Knack-Application-Id': this.config.knackAppId,
+            'X-Knack-REST-API-Key': this.config.knackApiKey,
+            'Content-Type': 'application/json'
+        };
+
+        // If a completion record already exists, don't touch the connection field again.
+        if (completions.length > 0) {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({ field_1432: JSON.stringify(json) })
+            });
+            if (!response.ok) {
+                const error = await response.text();
+                console.error('[API] Completion failed:', error);
+                throw new Error('Failed to save completion');
+            }
+            return response.json();
         }
-        return response.json();
+
+        // Otherwise, create a new completion record.
+        // Knack connection fields usually accept an array of record IDs.
+        const createAttempts = [
+            { field_1437: [user.id], field_1432: JSON.stringify(json) },
+            { field_1437: [{ id: user.id }], field_1432: JSON.stringify(json) }
+        ];
+        let lastErrorText = '';
+        for (const data of createAttempts) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(data)
+            });
+            if (response.ok) return response.json();
+            lastErrorText = await response.text();
+        }
+        console.error('[API] Completion failed:', lastErrorText);
+        throw new Error('Failed to save completion');
     }
 
     async getDiscussions(activityId) {
@@ -1249,7 +1265,9 @@ const P3 = {
         const modal = document.getElementById('vespaPdfModal');
         const frame = document.getElementById('vespaPdfModalFrame');
         if (!overlay || !modal || !frame) return;
-        frame.src = pdf;
+        // Some PDF hosts block iframe embedding (X-Frame-Options).
+        // Use Google gview as a resilient embed wrapper.
+        frame.src = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(pdf)}`;
         overlay.style.display = 'block';
         modal.style.display = 'block';
         // Escape closes
