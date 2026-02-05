@@ -1350,7 +1350,9 @@ const P3 = {
         try { frame.src = ''; } catch (_) {}
         if (openNewTab) openNewTab.href = pdf;
         overlay.style.display = 'block';
-        modal.style.display = 'block';
+        // IMPORTANT: modal has an inline `display:none`; setting it to `block` breaks our CSS flex layout.
+        // Use `flex` so `.vespa-pdf-modal-body` can fill remaining height.
+        modal.style.display = 'flex';
 
         const raf = window.requestAnimationFrame ? window.requestAnimationFrame.bind(window) : (fn) => setTimeout(fn, 0);
         // Wait a frame so layout is committed, then size + load.
