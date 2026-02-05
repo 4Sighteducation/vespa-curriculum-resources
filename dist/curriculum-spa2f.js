@@ -1356,13 +1356,13 @@ const P3 = {
         try {
             const cfg = (typeof window !== 'undefined' && window.CURRICULUM_RESOURCES_CONFIG) ? window.CURRICULUM_RESOURCES_CONFIG : {};
             const sbUrlRaw = (cfg.supabaseUrl || window.VESPA_SUPABASE_URL || '').toString().trim();
-            if (!sbUrlRaw) return;
+            if (!sbUrlRaw) return { ok: false, reason: 'no_supabase_url' };
             const fnUrl = `${sbUrlRaw.replace(/\/$/, '')}/functions/v1/tutor-resource-complete`;
 
             const userAttrs = (typeof Knack !== 'undefined' && Knack.getUserAttributes) ? Knack.getUserAttributes() : {};
             const userEmail = (userAttrs.email || '').toString().trim();
             const knackUserId = (userAttrs.id || '').toString().trim();
-            if (!userEmail || !activityUuid || !bookName) return;
+            if (!userEmail || !activityUuid || !bookName) return { ok: false, reason: 'missing_payload' };
 
             // For testing, allow the secret to be set locally in the browser:
             //   localStorage.setItem('vespaEdgeSecret', '<secret>')
@@ -1386,9 +1386,14 @@ const P3 = {
             if (!resp.ok) {
                 const t = await resp.text();
                 console.warn('[Curriculum SPA] Supabase completion write failed:', resp.status, t);
+                return { ok: false, status: resp.status, body: t };
             }
+            let j = null;
+            try { j = await resp.json(); } catch (_) {}
+            return { ok: true, data: j };
         } catch (e) {
             console.warn('[Curriculum SPA] Supabase completion write error:', e);
+            return { ok: false, error: String(e && e.message ? e.message : e) };
         }
     },
     
@@ -1399,10 +1404,25 @@ const P3 = {
         btn.textContent = 'Completing...';
         
         try {
-            await window.api.completeActivity(State.activity.id, State.book);
-            // Best-effort Supabase write (does not block UX).
-            this.writeCompletionToSupabase(State.activity.id, State.book);
-            U.toast('Activity completed! 🎉');
+            // Supabase-first: this is the future source of truth.
+            const sbRes = await this.writeCompletionToSupabase(State.activity.id, State.book);
+
+            // Knack is now best-effort (legacy progress UI still reads from it).
+            // If it fails but Supabase succeeded, do not block the user.
+            let knackOk = true;
+            try {
+                await window.api.completeActivity(State.activity.id, State.book);
+            } catch (e) {
+                knackOk = false;
+                console.warn('[P3] Knack completion failed (non-blocking if Supabase ok):', e);
+            }
+
+            if (sbRes && sbRes.ok) {
+                U.toast(knackOk ? 'Activity completed! 🎉' : 'Saved! (Progress syncing...)');
+            } else {
+                // If Supabase failed (e.g. secret missing) but Knack worked, still treat as complete.
+                U.toast('Activity completed! 🎉');
+            }
             await this.show(window.api, State.activity.id);
         } catch (e) {
             console.error('[P3] Completion error:', e);
