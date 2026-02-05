@@ -9,10 +9,14 @@
 
 (function () {
     try {
-        if (window.__VESPA_CURRICULUM_SPA2F_LOADED) {
-            // Already loaded/evaluated; do not redeclare globals.
+        // This bundle can be injected more than once. Older builds used a boolean guard
+        // which accidentally blocks new versions if an older copy ran first.
+        // Version the guard off the loader version so updates always apply.
+        const build = String(window.__VESPA_LOADER_VERSION || 'unknown');
+        if (window.__VESPA_CURRICULUM_SPA2F_LOADED_BUILD === build) {
             return;
         }
+        window.__VESPA_CURRICULUM_SPA2F_LOADED_BUILD = build;
         window.__VESPA_CURRICULUM_SPA2F_LOADED = true;
     } catch (_) {}
 
@@ -442,6 +446,18 @@ class CurriculumAPI {
         const user = this.getCurrentUser();
         if (!user) return [];
 
+        // Local completion cache (used during migration to Supabase-first).
+        const getLocal = () => {
+            try {
+                const raw = (typeof localStorage !== 'undefined') ? localStorage.getItem('vespaTutorCompletionLocal_v1') : null;
+                const all = raw ? JSON.parse(raw) : {};
+                const email = String(user.email || '').trim();
+                return (email && all[email]) ? all[email] : {};
+            } catch (_) {
+                return {};
+            }
+        };
+
         // Primary: match Tutor connection (object_7 record id).
         // Back-compat: if older records were created using account id, fall back to that.
         const build = (val) => ({
@@ -457,7 +473,7 @@ class CurriculumAPI {
             records = await this.fetch('object_59', build(user.id));
         }
 
-        return records.map(r => {
+        const mapped = records.map(r => {
             let json = {};
             try {
                 const raw = r.field_1432_raw || r.field_1432;
@@ -465,6 +481,25 @@ class CurriculumAPI {
             } catch (e) {}
             return { id: r.id, completed: json };
         });
+
+        // Merge in local cache so progress can update even if Knack write/read lags.
+        try {
+            const local = getLocal();
+            if (local && Object.keys(local).length) {
+                if (mapped.length === 0) mapped.push({ id: 'local', completed: {} });
+                const base = mapped[0].completed || {};
+                for (const [book, ids] of Object.entries(local)) {
+                    if (!Array.isArray(ids)) continue;
+                    if (!base[book]) base[book] = [];
+                    for (const id of ids) {
+                        if (!base[book].includes(id)) base[book].push(id);
+                    }
+                }
+                mapped[0].completed = base;
+            }
+        } catch (_) {}
+
+        return mapped;
     }
 
     async calculateProgress(bookName) {
@@ -1400,6 +1435,34 @@ const P3 = {
             return { ok: false, error: String(e && e.message ? e.message : e) };
         }
     },
+
+    _readLocalCompletionState() {
+        try {
+            const raw = (typeof localStorage !== 'undefined') ? localStorage.getItem('vespaTutorCompletionLocal_v1') : null;
+            return raw ? JSON.parse(raw) : {};
+        } catch (_) {
+            return {};
+        }
+    },
+
+    _writeLocalCompletionState(state) {
+        try {
+            if (typeof localStorage === 'undefined') return;
+            localStorage.setItem('vespaTutorCompletionLocal_v1', JSON.stringify(state || {}));
+        } catch (_) {}
+    },
+
+    _storeLocalCompletion(userEmail, bookName, activityUuid) {
+        try {
+            if (!userEmail || !bookName || !activityUuid) return;
+            const state = this._readLocalCompletionState();
+            if (!state[userEmail]) state[userEmail] = {};
+            if (!state[userEmail][bookName]) state[userEmail][bookName] = [];
+            const arr = state[userEmail][bookName];
+            if (!arr.includes(activityUuid)) arr.push(activityUuid);
+            this._writeLocalCompletionState(state);
+        } catch (_) {}
+    },
     
     async complete() {
         const btn = document.querySelector('.btn-complete');
@@ -1410,12 +1473,23 @@ const P3 = {
         try {
             // Supabase-first: this is the future source of truth.
             const sbRes = await this.writeCompletionToSupabase(State.activity.id, State.book);
+            try {
+                const userAttrs = (typeof Knack !== 'undefined' && Knack.getUserAttributes) ? Knack.getUserAttributes() : {};
+                const userEmail = (userAttrs.email || '').toString().trim();
+                if (sbRes && sbRes.ok) this._storeLocalCompletion(userEmail, State.book, State.activity.id);
+            } catch (_) {}
 
             // Knack is now best-effort (legacy progress UI still reads from it).
             // If it fails but Supabase succeeded, do not block the user.
             let knackOk = true;
             try {
                 await window.api.completeActivity(State.activity.id, State.book);
+                // Also mirror into local cache so progress can still reflect completion even if Knack read is flaky.
+                try {
+                    const userAttrs = (typeof Knack !== 'undefined' && Knack.getUserAttributes) ? Knack.getUserAttributes() : {};
+                    const userEmail = (userAttrs.email || '').toString().trim();
+                    this._storeLocalCompletion(userEmail, State.book, State.activity.id);
+                } catch (_) {}
             } catch (e) {
                 knackOk = false;
                 console.warn('[P3] Knack completion failed (non-blocking if Supabase ok):', e);
