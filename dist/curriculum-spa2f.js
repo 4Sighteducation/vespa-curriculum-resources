@@ -1248,7 +1248,10 @@ const P3 = {
             <div id="vespaPdfModal" class="vespa-pdf-modal" style="display:none" role="dialog" aria-modal="true" aria-label="PDF viewer">
                 <div class="vespa-pdf-modal-header">
                     <div class="vespa-pdf-modal-title">PDF</div>
-                    <button class="vespa-pdf-modal-close" onclick="P3.closePdfModal()">×</button>
+                    <div style="display:flex;gap:10px;align-items:center">
+                        <a id="vespaPdfModalOpenNewTab" href="#" target="_blank" rel="noopener noreferrer" style="font-weight:600;text-decoration:none">Open in new tab</a>
+                        <button class="vespa-pdf-modal-close" onclick="P3.closePdfModal()">×</button>
+                    </div>
                 </div>
                 <div class="vespa-pdf-modal-body">
                     <iframe id="vespaPdfModalFrame" src="" width="100%" height="100%" loading="lazy"></iframe>
@@ -1264,10 +1267,12 @@ const P3 = {
         const overlay = document.getElementById('vespaPdfModalOverlay');
         const modal = document.getElementById('vespaPdfModal');
         const frame = document.getElementById('vespaPdfModalFrame');
+        const openNewTab = document.getElementById('vespaPdfModalOpenNewTab');
         if (!overlay || !modal || !frame) return;
-        // Some PDF hosts block iframe embedding (X-Frame-Options).
-        // Use Google gview as a resilient embed wrapper.
-        frame.src = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(pdf)}`;
+        // Prefer direct PDF embedding (your assets live on vespa.academy).
+        // If a host blocks iframe embedding, users can still open in a new tab via the header link.
+        frame.src = pdf;
+        if (openNewTab) openNewTab.href = pdf;
         overlay.style.display = 'block';
         modal.style.display = 'block';
         // Escape closes
