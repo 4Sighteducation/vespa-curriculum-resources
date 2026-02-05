@@ -1267,14 +1267,31 @@ const P3 = {
         const overlay = document.getElementById('vespaPdfModalOverlay');
         const modal = document.getElementById('vespaPdfModal');
         const frame = document.getElementById('vespaPdfModalFrame');
+        const body = modal ? modal.querySelector('.vespa-pdf-modal-body') : null;
         const openNewTab = document.getElementById('vespaPdfModalOpenNewTab');
         if (!overlay || !modal || !frame) return;
         // Prefer direct PDF embedding (your assets live on vespa.academy).
-        // If a host blocks iframe embedding, users can still open in a new tab via the header link.
-        frame.src = pdf;
+        // Important: the modal is initially display:none; Chrome's built-in PDF viewer can
+        // "lock" its layout based on the iframe's initial tiny size if we set src too early.
+        // So we show the modal first, then set src on the next frame.
+        try { frame.src = ''; } catch (_) {}
         if (openNewTab) openNewTab.href = pdf;
         overlay.style.display = 'block';
         modal.style.display = 'block';
+        try {
+            // Force a deterministic pixel height for the iframe before loading.
+            if (body && body.getBoundingClientRect) {
+                const h = Math.max(200, Math.floor(body.getBoundingClientRect().height || 0));
+                frame.style.height = `${h}px`;
+            }
+        } catch (_) {}
+        try {
+            (window.requestAnimationFrame || setTimeout)(() => {
+                try { frame.src = pdf; } catch (_) {}
+            }, 0);
+        } catch (_) {
+            try { frame.src = pdf; } catch (_) {}
+        }
         // Escape closes
         try {
             this._onPdfEsc = (e) => {
