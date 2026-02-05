@@ -1296,6 +1296,46 @@ const P3 = {
             this._onPdfEsc = null;
         } catch (_) {}
     },
+
+    async writeCompletionToSupabase(activityUuid, bookName) {
+        try {
+            const cfg = (typeof window !== 'undefined' && window.CURRICULUM_RESOURCES_CONFIG) ? window.CURRICULUM_RESOURCES_CONFIG : {};
+            const sbUrlRaw = (cfg.supabaseUrl || window.VESPA_SUPABASE_URL || '').toString().trim();
+            if (!sbUrlRaw) return;
+            const fnUrl = `${sbUrlRaw.replace(/\/$/, '')}/functions/v1/tutor-resource-complete`;
+
+            const userAttrs = (typeof Knack !== 'undefined' && Knack.getUserAttributes) ? Knack.getUserAttributes() : {};
+            const userEmail = (userAttrs.email || '').toString().trim();
+            const knackUserId = (userAttrs.id || '').toString().trim();
+            if (!userEmail || !activityUuid || !bookName) return;
+
+            // For testing, allow the secret to be set locally in the browser:
+            //   localStorage.setItem('vespaEdgeSecret', '<secret>')
+            const edgeSecret = (typeof localStorage !== 'undefined')
+                ? (localStorage.getItem('vespaEdgeSecret') || '').toString()
+                : '';
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (edgeSecret) headers['x-vespa-edge-secret'] = edgeSecret;
+
+            const resp = await fetch(fnUrl, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    user_email: userEmail,
+                    knack_user_id: knackUserId || null,
+                    activity_id: String(activityUuid),
+                    book: String(bookName)
+                })
+            });
+            if (!resp.ok) {
+                const t = await resp.text();
+                console.warn('[Curriculum SPA] Supabase completion write failed:', resp.status, t);
+            }
+        } catch (e) {
+            console.warn('[Curriculum SPA] Supabase completion write error:', e);
+        }
+    },
     
     async complete() {
         const btn = document.querySelector('.btn-complete');
@@ -1305,6 +1345,8 @@ const P3 = {
         
         try {
             await window.api.completeActivity(State.activity.id, State.book);
+            // Best-effort Supabase write (does not block UX).
+            this.writeCompletionToSupabase(State.activity.id, State.book);
             U.toast('Activity completed! 🎉');
             await this.show(window.api, State.activity.id);
         } catch (e) {
