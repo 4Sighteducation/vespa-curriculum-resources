@@ -1316,20 +1316,24 @@ const P3 = {
         if (openNewTab) openNewTab.href = pdf;
         overlay.style.display = 'block';
         modal.style.display = 'block';
-        try {
-            // Force a deterministic pixel height for the iframe before loading.
-            if (body && body.getBoundingClientRect) {
-                const h = Math.max(200, Math.floor(body.getBoundingClientRect().height || 0));
-                frame.style.height = `${h}px`;
-            }
-        } catch (_) {}
-        try {
-            (window.requestAnimationFrame || setTimeout)(() => {
+
+        const raf = window.requestAnimationFrame ? window.requestAnimationFrame.bind(window) : (fn) => setTimeout(fn, 0);
+        // Wait a frame so layout is committed, then size + load.
+        raf(() => {
+            try {
+                if (body && body.getBoundingClientRect) {
+                    const h = Math.max(240, Math.floor(body.getBoundingClientRect().height || 0));
+                    frame.style.height = `${h}px`;
+                } else {
+                    // Fallback to a sensible viewport-based height
+                    frame.style.height = '75vh';
+                }
+            } catch (_) {}
+            // Load after sizing (another frame is safest for Chrome PDF viewer)
+            raf(() => {
                 try { frame.src = pdf; } catch (_) {}
-            }, 0);
-        } catch (_) {
-            try { frame.src = pdf; } catch (_) {}
-        }
+            });
+        });
         // Escape closes
         try {
             this._onPdfEsc = (e) => {
