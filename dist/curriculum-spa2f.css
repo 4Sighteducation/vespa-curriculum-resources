@@ -790,11 +790,20 @@
 }
 
 .vespa-pdf-modal-body {
-    flex: 1;
+    flex: 1 1 auto;
+    /* Critical for flex children (iframe) to fill remaining height */
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
 }
 
 .vespa-pdf-modal-body iframe {
     border: none;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 /* Mobile Responsive */
